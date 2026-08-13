@@ -1,0 +1,782 @@
+{
+  "name": "xcodekit",
+  "displayName": "XcodeKit",
+  "description": "Build, run, test and manage iOS/macOS Xcode projects and simulators directly from VS Code — with first-class AI agent tools.",
+  "version": "1.3.0",
+  "publisher": "mithlesh",
+  "author": {
+    "name": "Deepak Sharma"
+  },
+  "license": "MIT",
+  "homepage": "https://marketplace.visualstudio.com/items?itemName=mithlesh.xcodekit",
+  "icon": "media/icon.png",
+  "galleryBanner": {
+    "color": "#0A84FF",
+    "theme": "dark"
+  },
+  "preview": false,
+  "pricing": "Free",
+  "qna": "marketplace",
+  "extensionKind": [
+    "workspace"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": false,
+      "description": "XcodeKit executes xcodebuild and xcrun commands from the current workspace."
+    },
+    "virtualWorkspaces": {
+      "supported": false,
+      "description": "Xcode projects, build products and simulators require a local macOS file system."
+    }
+  },
+  "engines": {
+    "vscode": "^1.95.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Testing",
+    "Other"
+  ],
+  "keywords": [
+    "swift",
+    "ios",
+    "xcode",
+    "xcodebuild",
+    "simulator",
+    "simctl",
+    "swiftui",
+    "xctest",
+    "swift-testing",
+    "ios-development",
+    "mobile-development",
+    "copilot-tools",
+    "ai-agent"
+  ],
+  "activationEvents": [
+    "workspaceContains:**/*.xcodeproj",
+    "workspaceContains:**/*.xcworkspace",
+    "workspaceContains:**/Package.swift",
+    "onLanguage:swift"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "XcodeKit",
+      "properties": {
+        "xcodekit.projectPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the .xcodeproj or .xcworkspace to use. Leave empty to auto-detect."
+        },
+        "xcodekit.scheme": {
+          "type": "string",
+          "default": "",
+          "description": "The default Xcode scheme to build/run/test."
+        },
+        "xcodekit.configuration": {
+          "type": "string",
+          "default": "Debug",
+          "description": "Build configuration (e.g. Debug, Release)."
+        },
+        "xcodekit.destination": {
+          "type": "string",
+          "default": "",
+          "description": "The selected simulator/device destination UDID. Leave empty to select interactively."
+        },
+        "xcodekit.testPlan": {
+          "type": "string",
+          "default": "",
+          "description": "The selected test plan (.xctestplan base name) to run. Leave empty to use the scheme's default."
+        },
+        "xcodekit.testTarget": {
+          "type": "string",
+          "default": "",
+          "description": "The selected test target to run. Leave empty to run all tests."
+        },
+        "xcodekit.derivedDataPath": {
+          "type": "string",
+          "default": "",
+          "scope": "machine-overridable",
+          "description": "Custom derivedData path. Leave empty to use the default under the workspace (.build/DerivedData)."
+        },
+        "xcodekit.extraBuildArgs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Extra arguments appended to every xcodebuild invocation."
+        },
+        "xcodekit.streamAppLogs": {
+          "type": "boolean",
+          "default": true,
+          "description": "Stream the launched app's console output into the 'XcodeKit App' output channel."
+        },
+        "xcodekit.openSimulatorOnRun": {
+          "type": "boolean",
+          "default": true,
+          "description": "Bring Simulator.app to the front when the app is launched."
+        },
+        "xcodekit.autoRevealBuildLog": {
+          "type": "boolean",
+          "default": false,
+          "description": "Open the build log panel automatically whenever a build, test or clean starts."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "xcodekit.build",
+        "title": "Build",
+        "category": "XcodeKit",
+        "icon": "$(tools)"
+      },
+      {
+        "command": "xcodekit.clean",
+        "title": "Clean Build Folder",
+        "category": "XcodeKit",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "xcodekit.run",
+        "title": "Build & Run",
+        "category": "XcodeKit",
+        "icon": "$(play)"
+      },
+      {
+        "command": "xcodekit.stop",
+        "title": "Stop",
+        "category": "XcodeKit",
+        "icon": "$(debug-stop)"
+      },
+      {
+        "command": "xcodekit.stopApp",
+        "title": "Stop Running App",
+        "category": "XcodeKit",
+        "icon": "$(debug-stop)"
+      },
+      {
+        "command": "xcodekit.test",
+        "title": "Run Tests",
+        "category": "XcodeKit",
+        "icon": "$(beaker)"
+      },
+      {
+        "command": "xcodekit.selectScheme",
+        "title": "Select Scheme",
+        "category": "XcodeKit"
+      },
+      {
+        "command": "xcodekit.selectConfiguration",
+        "title": "Select Build Configuration",
+        "category": "XcodeKit"
+      },
+      {
+        "command": "xcodekit.selectDestination",
+        "title": "Select Destination (Simulator/Device)",
+        "category": "XcodeKit"
+      },
+      {
+        "command": "xcodekit.bootSimulator",
+        "title": "Boot Simulator",
+        "category": "XcodeKit",
+        "icon": "$(vm-running)"
+      },
+      {
+        "command": "xcodekit.shutdownSimulator",
+        "title": "Shutdown Simulator",
+        "category": "XcodeKit",
+        "icon": "$(vm-outline)"
+      },
+      {
+        "command": "xcodekit.openSimulatorApp",
+        "title": "Open Simulator.app",
+        "category": "XcodeKit",
+        "icon": "$(device-mobile)"
+      },
+      {
+        "command": "xcodekit.eraseSimulator",
+        "title": "Erase Simulator Content",
+        "category": "XcodeKit"
+      },
+      {
+        "command": "xcodekit.refreshSimulators",
+        "title": "Refresh Simulators",
+        "category": "XcodeKit",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "xcodekit.refreshSchemes",
+        "title": "Refresh Schemes",
+        "category": "XcodeKit",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "xcodekit.showOutput",
+        "title": "Show Build Output",
+        "category": "XcodeKit",
+        "icon": "$(output)"
+      },
+      {
+        "command": "xcodekit.selectTarget",
+        "title": "Select Scheme, Configuration or Destination",
+        "category": "XcodeKit",
+        "icon": "$(target)"
+      },
+      {
+        "command": "xcodekit.selectProject",
+        "title": "Select Xcode Project or Workspace",
+        "category": "XcodeKit",
+        "icon": "$(folder-opened)"
+      },
+      {
+        "command": "xcodekit.selectTestPlan",
+        "title": "Select Test Plan",
+        "category": "XcodeKit",
+        "icon": "$(checklist)"
+      },
+      {
+        "command": "xcodekit.selectTestTarget",
+        "title": "Select Test Target",
+        "category": "XcodeKit",
+        "icon": "$(beaker)"
+      },
+      {
+        "command": "xcodekit.showIssues",
+        "title": "Show Build Issues",
+        "category": "XcodeKit",
+        "icon": "$(list-flat)"
+      },
+      {
+        "command": "xcodekit.showAppLog",
+        "title": "Show App Console",
+        "category": "XcodeKit",
+        "icon": "$(terminal)"
+      },
+      {
+        "command": "xcodekit.setDestination",
+        "title": "Set as Destination",
+        "category": "XcodeKit",
+        "icon": "$(pass)"
+      },
+      {
+        "command": "xcodekit.copySimulatorUdid",
+        "title": "Copy Simulator UDID",
+        "category": "XcodeKit",
+        "icon": "$(copy)"
+      },
+      {
+        "command": "xcodekit.openUrlOnSimulator",
+        "title": "Open URL or Deep Link…",
+        "category": "XcodeKit",
+        "icon": "$(link)"
+      },
+      {
+        "command": "xcodekit.screenshotSimulator",
+        "title": "Take Screenshot",
+        "category": "XcodeKit",
+        "icon": "$(device-camera)"
+      },
+      {
+        "command": "xcodekit.toggleRecording",
+        "title": "Start / Stop Screen Recording",
+        "category": "XcodeKit",
+        "icon": "$(record)"
+      },
+      {
+        "command": "xcodekit.toggleAppearance",
+        "title": "Toggle Light / Dark Appearance",
+        "category": "XcodeKit",
+        "icon": "$(color-mode)"
+      },
+      {
+        "command": "xcodekit.openAppContainer",
+        "title": "Open App Data Container",
+        "category": "XcodeKit",
+        "icon": "$(folder-opened)"
+      },
+      {
+        "command": "xcodekit.uninstallApp",
+        "title": "Uninstall App from Simulator",
+        "category": "XcodeKit",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "xcodekit.openWalkthrough",
+        "title": "Getting Started",
+        "category": "XcodeKit",
+        "icon": "$(book)"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "xcodekit.build",
+        "key": "ctrl+cmd+b",
+        "mac": "ctrl+cmd+b",
+        "when": "xcodekit.hasProject && !xcodekit.running"
+      },
+      {
+        "command": "xcodekit.run",
+        "key": "ctrl+cmd+r",
+        "mac": "ctrl+cmd+r",
+        "when": "xcodekit.hasProject && !xcodekit.running"
+      },
+      {
+        "command": "xcodekit.test",
+        "key": "ctrl+cmd+u",
+        "mac": "ctrl+cmd+u",
+        "when": "xcodekit.hasProject && !xcodekit.running"
+      },
+      {
+        "command": "xcodekit.clean",
+        "key": "ctrl+cmd+k",
+        "mac": "ctrl+cmd+k",
+        "when": "xcodekit.hasProject && !xcodekit.running"
+      },
+      {
+        "command": "xcodekit.stop",
+        "key": "ctrl+cmd+.",
+        "mac": "ctrl+cmd+.",
+        "when": "xcodekit.running || xcodekit.appRunning"
+      },
+      {
+        "command": "xcodekit.selectDestination",
+        "key": "ctrl+cmd+d",
+        "mac": "ctrl+cmd+d",
+        "when": "xcodekit.hasProject"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "xcodekit",
+          "title": "XcodeKit",
+          "icon": "media/activity.svg"
+        }
+      ]
+    },
+    "views": {
+      "xcodekit": [
+        {
+          "id": "xcodekit.schemes",
+          "name": "Build & Run",
+          "icon": "$(target)",
+          "contextualTitle": "XcodeKit"
+        },
+        {
+          "id": "xcodekit.simulators",
+          "name": "Simulators",
+          "icon": "$(device-mobile)",
+          "contextualTitle": "XcodeKit"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "xcodekit.schemes",
+        "when": "!xcodekit.hasProject",
+        "contents": "No Xcode project or workspace was found in this folder.\n\n[Select Xcode Project…](command:xcodekit.selectProject)\n\nOpen a folder that contains an `.xcodeproj`, `.xcworkspace`, or `Package.swift`, or pick one manually above.\n\n[Take the tour](command:xcodekit.openWalkthrough)"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "xcodekit.setDestination",
+          "when": "false"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "xcodekit.run",
+          "when": "view == xcodekit.schemes && !xcodekit.running",
+          "group": "navigation@1"
+        },
+        {
+          "command": "xcodekit.stop",
+          "when": "view == xcodekit.schemes && xcodekit.running",
+          "group": "navigation@1"
+        },
+        {
+          "command": "xcodekit.build",
+          "when": "view == xcodekit.schemes && !xcodekit.running",
+          "group": "navigation@2"
+        },
+        {
+          "command": "xcodekit.test",
+          "when": "view == xcodekit.schemes && !xcodekit.running",
+          "group": "navigation@3"
+        },
+        {
+          "command": "xcodekit.stopApp",
+          "when": "view == xcodekit.schemes && xcodekit.appRunning",
+          "group": "navigation@4"
+        },
+        {
+          "command": "xcodekit.refreshSchemes",
+          "when": "view == xcodekit.schemes",
+          "group": "navigation@5"
+        },
+        {
+          "command": "xcodekit.clean",
+          "when": "view == xcodekit.schemes && !xcodekit.running",
+          "group": "1_build@1"
+        },
+        {
+          "command": "xcodekit.showOutput",
+          "when": "view == xcodekit.schemes",
+          "group": "1_build@2"
+        },
+        {
+          "command": "xcodekit.showAppLog",
+          "when": "view == xcodekit.schemes",
+          "group": "1_build@3"
+        },
+        {
+          "command": "xcodekit.showIssues",
+          "when": "view == xcodekit.schemes",
+          "group": "1_build@4"
+        },
+        {
+          "command": "xcodekit.selectScheme",
+          "when": "view == xcodekit.schemes",
+          "group": "2_config@1"
+        },
+        {
+          "command": "xcodekit.selectConfiguration",
+          "when": "view == xcodekit.schemes",
+          "group": "2_config@2"
+        },
+        {
+          "command": "xcodekit.selectDestination",
+          "when": "view == xcodekit.schemes",
+          "group": "2_config@3"
+        },
+        {
+          "command": "xcodekit.selectTestPlan",
+          "when": "view == xcodekit.schemes",
+          "group": "2_config@4"
+        },
+        {
+          "command": "xcodekit.selectTestTarget",
+          "when": "view == xcodekit.schemes",
+          "group": "2_config@5"
+        },
+        {
+          "command": "xcodekit.selectProject",
+          "when": "view == xcodekit.schemes",
+          "group": "3_project@1"
+        },
+        {
+          "command": "xcodekit.refreshSimulators",
+          "when": "view == xcodekit.simulators",
+          "group": "navigation@1"
+        },
+        {
+          "command": "xcodekit.openSimulatorApp",
+          "when": "view == xcodekit.simulators",
+          "group": "navigation@2"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "xcodekit.bootSimulator",
+          "when": "view == xcodekit.simulators && viewItem =~ /\\.shutdown\\./",
+          "group": "inline@1"
+        },
+        {
+          "command": "xcodekit.shutdownSimulator",
+          "when": "view == xcodekit.simulators && viewItem =~ /\\.booted\\./",
+          "group": "inline@1"
+        },
+        {
+          "command": "xcodekit.screenshotSimulator",
+          "when": "view == xcodekit.simulators && viewItem =~ /\\.booted\\./",
+          "group": "inline@2"
+        },
+        {
+          "command": "xcodekit.setDestination",
+          "when": "view == xcodekit.simulators && viewItem =~ /\\.unselected\\./",
+          "group": "1_destination@1"
+        },
+        {
+          "command": "xcodekit.bootSimulator",
+          "when": "view == xcodekit.simulators && viewItem =~ /\\.shutdown\\./",
+          "group": "1_destination@2"
+        },
+        {
+          "command": "xcodekit.shutdownSimulator",
+          "when": "view == xcodekit.simulators && viewItem =~ /\\.booted\\./",
+          "group": "1_destination@2"
+        },
+        {
+          "command": "xcodekit.openUrlOnSimulator",
+          "when": "view == xcodekit.simulators && viewItem =~ /^simulator\\./",
+          "group": "2_device@1"
+        },
+        {
+          "command": "xcodekit.screenshotSimulator",
+          "when": "view == xcodekit.simulators && viewItem =~ /\\.booted\\./",
+          "group": "2_device@2"
+        },
+        {
+          "command": "xcodekit.toggleRecording",
+          "when": "view == xcodekit.simulators && viewItem =~ /\\.booted\\./",
+          "group": "2_device@3"
+        },
+        {
+          "command": "xcodekit.toggleAppearance",
+          "when": "view == xcodekit.simulators && viewItem =~ /\\.booted\\./",
+          "group": "2_device@4"
+        },
+        {
+          "command": "xcodekit.openAppContainer",
+          "when": "view == xcodekit.simulators && viewItem =~ /\\.booted\\./",
+          "group": "3_app@1"
+        },
+        {
+          "command": "xcodekit.uninstallApp",
+          "when": "view == xcodekit.simulators && viewItem =~ /\\.booted\\./",
+          "group": "3_app@2"
+        },
+        {
+          "command": "xcodekit.copySimulatorUdid",
+          "when": "view == xcodekit.simulators && viewItem =~ /^simulator\\./",
+          "group": "8_copy@1"
+        },
+        {
+          "command": "xcodekit.eraseSimulator",
+          "when": "view == xcodekit.simulators && viewItem =~ /^simulator\\./",
+          "group": "9_danger@1"
+        }
+      ]
+    },
+    "languageModelTools": [
+      {
+        "name": "xcodekit_build",
+        "displayName": "Build iOS Project",
+        "modelDescription": "Builds the current Xcode project or workspace using xcodebuild for a given scheme and destination. Returns the build status and any compiler errors/warnings. Use this to verify that Swift/Objective-C code compiles.",
+        "userDescription": "Build the iOS project with xcodebuild",
+        "toolReferenceName": "iosBuild",
+        "canBeReferencedInPrompt": true,
+        "icon": "$(tools)",
+        "tags": [
+          "ios",
+          "xcode",
+          "build"
+        ],
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "scheme": {
+              "type": "string",
+              "description": "The Xcode scheme to build. Optional; defaults to the currently selected scheme."
+            },
+            "configuration": {
+              "type": "string",
+              "description": "Build configuration such as Debug or Release. Optional."
+            },
+            "destinationId": {
+              "type": "string",
+              "description": "Simulator/device UDID to build for. Optional; defaults to the selected destination."
+            }
+          }
+        }
+      },
+      {
+        "name": "xcodekit_test",
+        "displayName": "Run iOS Tests",
+        "modelDescription": "Runs the unit/UI tests of the current Xcode project using 'xcodebuild test'. Returns pass/fail summary and failing test details. Optionally filter to a specific test target, class, or method via testIdentifier (e.g. 'MyAppTests/LoginTests/testValidLogin').",
+        "userDescription": "Run iOS tests with xcodebuild",
+        "toolReferenceName": "iosTest",
+        "canBeReferencedInPrompt": true,
+        "icon": "$(beaker)",
+        "tags": [
+          "ios",
+          "xcode",
+          "test"
+        ],
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "scheme": {
+              "type": "string",
+              "description": "The scheme whose tests to run. Optional; defaults to the selected scheme."
+            },
+            "destinationId": {
+              "type": "string",
+              "description": "Simulator UDID to run tests on. Optional; defaults to the selected destination."
+            },
+            "testIdentifier": {
+              "type": "string",
+              "description": "Optional single test/target/class identifier to run, e.g. 'MyAppTests/LoginTests/testValidLogin'."
+            }
+          }
+        }
+      },
+      {
+        "name": "xcodekit_run",
+        "displayName": "Run iOS App on Simulator",
+        "modelDescription": "Builds the app, installs it on the selected iOS simulator (booting it if needed), and launches it. Returns the launch status and the app bundle identifier.",
+        "userDescription": "Build, install and launch the app on a simulator",
+        "toolReferenceName": "iosRun",
+        "canBeReferencedInPrompt": true,
+        "icon": "$(play)",
+        "tags": [
+          "ios",
+          "xcode",
+          "simulator",
+          "run"
+        ],
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "scheme": {
+              "type": "string",
+              "description": "The scheme to run. Optional; defaults to the selected scheme."
+            },
+            "destinationId": {
+              "type": "string",
+              "description": "Simulator UDID to run on. Optional; defaults to the selected destination."
+            }
+          }
+        }
+      },
+      {
+        "name": "xcodekit_listSchemes",
+        "displayName": "List Xcode Schemes",
+        "modelDescription": "Lists all schemes, targets and configurations available in the current Xcode project or workspace. Use this to discover valid scheme names before building, running or testing.",
+        "userDescription": "List available Xcode schemes and targets",
+        "toolReferenceName": "iosSchemes",
+        "canBeReferencedInPrompt": true,
+        "icon": "$(target)",
+        "tags": [
+          "ios",
+          "xcode"
+        ],
+        "inputSchema": {
+          "type": "object",
+          "properties": {}
+        }
+      },
+      {
+        "name": "xcodekit_listSimulators",
+        "displayName": "List iOS Simulators",
+        "modelDescription": "Lists available iOS simulators grouped by runtime, including their name, UDID and boot state. Use this to discover valid destination UDIDs.",
+        "userDescription": "List available iOS simulators",
+        "toolReferenceName": "iosSimulators",
+        "canBeReferencedInPrompt": true,
+        "icon": "$(device-mobile)",
+        "tags": [
+          "ios",
+          "simulator"
+        ],
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "availableOnly": {
+              "type": "boolean",
+              "description": "If true, only include simulators that are currently available. Defaults to true."
+            }
+          }
+        }
+      },
+      {
+        "name": "xcodekit_bootSimulator",
+        "displayName": "Boot iOS Simulator",
+        "modelDescription": "Boots an iOS simulator by UDID (or the selected destination) so that apps can be installed and launched on it.",
+        "userDescription": "Boot an iOS simulator",
+        "toolReferenceName": "iosBoot",
+        "canBeReferencedInPrompt": true,
+        "icon": "$(vm-running)",
+        "tags": [
+          "ios",
+          "simulator"
+        ],
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "udid": {
+              "type": "string",
+              "description": "UDID of the simulator to boot. Optional; defaults to the selected destination."
+            }
+          }
+        }
+      }
+    ],
+    "walkthroughs": [
+      {
+        "id": "xcodekit.welcome",
+        "title": "Get started with XcodeKit",
+        "description": "Build, run and test your iOS app on a simulator without leaving VS Code.",
+        "when": "isMac",
+        "steps": [
+          {
+            "id": "xcodekit.walkthrough.project",
+            "title": "Pick your project",
+            "description": "XcodeKit auto-detects an .xcodeproj, .xcworkspace or Package.swift in your folder. If you have several, choose one.\n[Select Xcode Project](command:xcodekit.selectProject)",
+            "media": {
+              "markdown": "media/walkthrough/project.md"
+            },
+            "completionEvents": [
+              "onCommand:xcodekit.selectProject"
+            ]
+          },
+          {
+            "id": "xcodekit.walkthrough.destination",
+            "title": "Choose a simulator",
+            "description": "Open the XcodeKit view in the Activity Bar and click any simulator to make it your run destination — booted devices are listed first.\n[Select Destination](command:xcodekit.selectDestination)",
+            "media": {
+              "markdown": "media/walkthrough/destination.md"
+            },
+            "completionEvents": [
+              "onCommand:xcodekit.selectDestination",
+              "onCommand:xcodekit.setDestination"
+            ]
+          },
+          {
+            "id": "xcodekit.walkthrough.run",
+            "title": "Build and run",
+            "description": "Hit Run to build, install and launch on the simulator. The app's console streams into the XcodeKit App output channel.\n[Build & Run](command:xcodekit.run)",
+            "media": {
+              "markdown": "media/walkthrough/run.md"
+            },
+            "completionEvents": [
+              "onCommand:xcodekit.run"
+            ]
+          },
+          {
+            "id": "xcodekit.walkthrough.ai",
+            "title": "Let Copilot drive Xcode",
+            "description": "Reference #iosBuild, #iosTest or #iosRun in Copilot Chat and the agent can compile your Swift code, run tests and read back the failures.\n[Open Chat](command:workbench.action.chat.open)",
+            "media": {
+              "markdown": "media/walkthrough/ai.md"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run check-types && node esbuild.js --production",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src --ext ts",
+    "test": "tsx --test test/**/*.test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/vscode": "^1.95.0",
+    "@typescript-eslint/eslint-plugin": "^7.13.0",
+    "@typescript-eslint/parser": "^7.13.0",
+    "esbuild": "^0.21.5",
+    "eslint": "^8.57.0",
+    "npm-run-all": "^4.1.5",
+    "tsx": "^4.23.12",
+    "typescript": "^5.5.2"
+  }
+}
