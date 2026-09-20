@@ -1,7 +1,7 @@
 <!--  Created by Deepak Sharma on 13/08/2026. -->
 ## Agent tools
 
-XcodeKit exposes the Xcode toolchain to Copilot and other AI agents:
+XBridge exposes the Xcode toolchain to Copilot and other AI agents:
 
 | Tool | What it does |
 | --- | --- |

@@ -5,7 +5,7 @@ import { ConfigService } from "./core/config";
 import { log } from "./core/log";
 import { XcodebuildService } from "./services/xcodebuild";
 import { SimctlService } from "./services/simctl";
-import { XcodeKitManager } from "./manager";
+import { XBridgeManager } from "./manager";
 import { SchemeTreeProvider } from "./views/schemeTree";
 import { SimulatorTreeProvider } from "./views/simulatorTree";
 import { StatusBar } from "./statusBar";
@@ -14,12 +14,12 @@ import { registerLanguageModelTools } from "./tools";
 import { registerTestExplorer } from "./testExplorer";
 
 export function activate(context: vscode.ExtensionContext): void {
-  log.info("XcodeKit activating");
+  log.info("XBridge activating");
 
   const config = new ConfigService();
   const simctl = new SimctlService();
   const xcodebuild = new XcodebuildService(config);
-  const manager = new XcodeKitManager(config, xcodebuild, simctl);
+  const manager = new XBridgeManager(config, xcodebuild, simctl);
   context.subscriptions.push(manager);
 
   const schemeTree = new SchemeTreeProvider(xcodebuild, config, simctl);
@@ -29,11 +29,11 @@ export function activate(context: vscode.ExtensionContext): void {
 
   // Tree views (rather than bare providers) so they can carry a title
   // description and an error badge on the Activity Bar icon.
-  const schemeView = vscode.window.createTreeView("xcodekit.schemes", {
+  const schemeView = vscode.window.createTreeView("xbridge.schemes", {
     treeDataProvider: schemeTree,
     showCollapseAll: true,
   });
-  const simulatorView = vscode.window.createTreeView("xcodekit.simulators", {
+  const simulatorView = vscode.window.createTreeView("xbridge.simulators", {
     treeDataProvider: simulatorTree,
     showCollapseAll: true,
   });
@@ -62,7 +62,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
     const app = manager.runningApp;
     statusBar.setAppRunning(app?.name);
-    void vscode.commands.executeCommand("setContext", "xcodekit.appRunning", Boolean(app));
+    void vscode.commands.executeCommand("setContext", "xbridge.appRunning", Boolean(app));
     simulatorTree.rerender();
   };
   context.subscriptions.push(manager.onDidChangeState(syncState));
@@ -82,7 +82,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((e) => {
-      if (e.affectsConfiguration("xcodekit")) {
+      if (e.affectsConfiguration("xbridge")) {
         schemeTree.refresh();
         simulatorTree.refresh();
         void syncProject();
@@ -95,7 +95,7 @@ export function activate(context: vscode.ExtensionContext): void {
   );
 
   void syncProject();
-  log.info("XcodeKit activated");
+  log.info("XBridge activated");
 }
 
 export function deactivate(): void {

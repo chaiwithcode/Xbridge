@@ -43,22 +43,22 @@ export class StatusBar implements vscode.Disposable {
     private readonly config: ConfigService,
     private readonly simctl: SimctlService
   ) {
-    this.runStop = this.create(106, "xcodekit.run", "Run");
-    this.build = this.create(105, "xcodekit.build", "Build", "$(tools)", "XcodeKit: Build");
-    this.test = this.create(104, "xcodekit.test", "Test", "$(beaker)", "XcodeKit: Run Tests");
-    this.scheme = this.create(103, "xcodekit.selectScheme", "Scheme");
-    this.destination = this.create(102, "xcodekit.selectDestination", "Destination");
+    this.runStop = this.create(106, "xbridge.run", "Run");
+    this.build = this.create(105, "xbridge.build", "Build", "$(tools)", "XBridge: Build");
+    this.test = this.create(104, "xbridge.test", "Test", "$(beaker)", "XBridge: Run Tests");
+    this.scheme = this.create(103, "xbridge.selectScheme", "Scheme");
+    this.destination = this.create(102, "xbridge.selectDestination", "Destination");
     this.toolbar = [this.runStop, this.build, this.test, this.scheme, this.destination];
 
     // The activity pill starts hidden and only appears while/after an action runs.
     this.activity = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 101);
-    this.activity.name = "XcodeKit Status";
-    this.activity.command = "xcodekit.showOutput";
+    this.activity.name = "XBridge Status";
+    this.activity.command = "xbridge.showOutput";
 
-    // Shown only while an app launched by XcodeKit is running.
+    // Shown only while an app launched by XBridge is running.
     this.app = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
-    this.app.name = "XcodeKit App";
-    this.app.command = "xcodekit.stopApp";
+    this.app.name = "XBridge App";
+    this.app.command = "xbridge.stopApp";
 
     this.updateRunStop();
   }
@@ -71,7 +71,7 @@ export class StatusBar implements vscode.Disposable {
     tooltip?: string
   ): vscode.StatusBarItem {
     const item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, priority);
-    item.name = `XcodeKit ${name}`;
+    item.name = `XBridge ${name}`;
     item.command = command;
     if (text) {
       item.text = text;
@@ -122,13 +122,13 @@ export class StatusBar implements vscode.Disposable {
   private updateRunStop(): void {
     if (this.running) {
       this.runStop.text = "$(debug-stop) Stop";
-      this.runStop.tooltip = "XcodeKit: Stop the running task";
-      this.runStop.command = "xcodekit.stop";
+      this.runStop.tooltip = "XBridge: Stop the running task";
+      this.runStop.command = "xbridge.stop";
       this.runStop.backgroundColor = new vscode.ThemeColor("statusBarItem.warningBackground");
     } else {
       this.runStop.text = "$(play) Run";
-      this.runStop.tooltip = "XcodeKit: Build & Run";
-      this.runStop.command = "xcodekit.run";
+      this.runStop.tooltip = "XBridge: Build & Run";
+      this.runStop.command = "xbridge.run";
       this.runStop.backgroundColor = undefined;
     }
   }
@@ -168,8 +168,8 @@ export class StatusBar implements vscode.Disposable {
     const scheme = this.config.scheme ?? "";
     const suffix = scheme ? ` ${scheme}` : "";
     this.activity.text = `$(sync~spin) ${this.phase}${suffix}…`;
-    this.activity.tooltip = "XcodeKit: In progress — click to show the build log";
-    this.activity.command = "xcodekit.showOutput";
+    this.activity.tooltip = "XBridge: In progress — click to show the build log";
+    this.activity.command = "xbridge.showOutput";
     this.activity.backgroundColor = undefined;
     this.activity.show();
   }
@@ -182,7 +182,7 @@ export class StatusBar implements vscode.Disposable {
     if (status.succeeded) {
       this.activity.text = `$(pass-filled) ${status.action} succeeded${warnPart}`;
       this.activity.backgroundColor = undefined;
-      this.activity.command = status.warnings > 0 ? "xcodekit.showIssues" : "xcodekit.showOutput";
+      this.activity.command = status.warnings > 0 ? "xbridge.showIssues" : "xbridge.showOutput";
       this.activity.tooltip = new vscode.MarkdownString(
         `**${status.action} succeeded**` +
           (status.warnings ? `\n\n${status.warnings} warning(s)` : "") +
@@ -192,7 +192,7 @@ export class StatusBar implements vscode.Disposable {
     } else {
       this.activity.text = `$(error) ${status.errors}${warnPart}`;
       this.activity.backgroundColor = new vscode.ThemeColor("statusBarItem.errorBackground");
-      this.activity.command = "xcodekit.showIssues";
+      this.activity.command = "xbridge.showIssues";
       this.activity.tooltip = new vscode.MarkdownString(
         `**${status.action} failed**\n\n${status.errors} error(s), ${status.warnings} warning(s)` +
           (status.testSummary ? `\n\n${status.testSummary}` : "") +
@@ -207,9 +207,9 @@ export class StatusBar implements vscode.Disposable {
     this.action = undefined;
     this.phase = undefined;
     this.activity.text = "$(error) Failed";
-    this.activity.command = "xcodekit.showOutput";
+    this.activity.command = "xbridge.showOutput";
     this.activity.backgroundColor = new vscode.ThemeColor("statusBarItem.errorBackground");
-    this.activity.tooltip = new vscode.MarkdownString(`**XcodeKit**\n\n${message}`);
+    this.activity.tooltip = new vscode.MarkdownString(`**XBridge**\n\n${message}`);
     this.activity.show();
   }
 

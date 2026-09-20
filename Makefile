@@ -1,6 +1,6 @@
 #  Created by Deepak Sharma on 13/07/2026.
 
-# XcodeKit — build & distribution automation.
+# XBridge — build & distribution automation.
 
 # Read name/version straight from package.json so the VSIX name stays in sync.
 NAME      := $(shell node -p "require('./package.json').name")

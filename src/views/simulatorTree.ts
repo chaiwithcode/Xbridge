@@ -61,7 +61,7 @@ export class SimulatorItem extends vscode.TreeItem {
     );
 
     this.command = {
-      command: "xcodekit.setDestination",
+      command: "xbridge.setDestination",
       title: "Set as Destination",
       arguments: [simulator.udid],
     };

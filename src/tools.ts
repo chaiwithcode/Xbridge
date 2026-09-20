@@ -1,6 +1,6 @@
 //  Created by Deepak Sharma on 03/07/2026.
 import * as vscode from "vscode";
-import { XcodeKitManager } from "./manager";
+import { XBridgeManager } from "./manager";
 
 type Tool<T> = vscode.LanguageModelTool<T>;
 
@@ -17,7 +17,7 @@ interface BuildInput {
 }
 
 class BuildTool implements Tool<BuildInput> {
-  constructor(private readonly manager: XcodeKitManager) {}
+  constructor(private readonly manager: XBridgeManager) {}
 
   async prepareInvocation(options: vscode.LanguageModelToolInvocationPrepareOptions<BuildInput>) {
     return {
@@ -48,7 +48,7 @@ interface TestInput {
 }
 
 class TestTool implements Tool<TestInput> {
-  constructor(private readonly manager: XcodeKitManager) {}
+  constructor(private readonly manager: XBridgeManager) {}
 
   async prepareInvocation(options: vscode.LanguageModelToolInvocationPrepareOptions<TestInput>) {
     return {
@@ -78,7 +78,7 @@ interface RunInput {
 }
 
 class RunTool implements Tool<RunInput> {
-  constructor(private readonly manager: XcodeKitManager) {}
+  constructor(private readonly manager: XBridgeManager) {}
 
   async prepareInvocation(_options: vscode.LanguageModelToolInvocationPrepareOptions<RunInput>) {
     return { invocationMessage: "Building and launching on simulator…" };
@@ -99,7 +99,7 @@ class RunTool implements Tool<RunInput> {
 }
 
 class ListSchemesTool implements Tool<Record<string, never>> {
-  constructor(private readonly manager: XcodeKitManager) {}
+  constructor(private readonly manager: XBridgeManager) {}
 
   async invoke(): Promise<vscode.LanguageModelToolResult> {
     const info = await this.manager.xcodebuild.listSchemes();
@@ -117,7 +117,7 @@ interface ListSimsInput {
 }
 
 class ListSimulatorsTool implements Tool<ListSimsInput> {
-  constructor(private readonly manager: XcodeKitManager) {}
+  constructor(private readonly manager: XBridgeManager) {}
 
   async invoke(
     options: vscode.LanguageModelToolInvocationOptions<ListSimsInput>
@@ -143,7 +143,7 @@ interface BootInput {
 }
 
 class BootSimulatorTool implements Tool<BootInput> {
-  constructor(private readonly manager: XcodeKitManager) {}
+  constructor(private readonly manager: XBridgeManager) {}
 
   async prepareInvocation(options: vscode.LanguageModelToolInvocationPrepareOptions<BootInput>) {
     return { invocationMessage: `Booting simulator ${options.input.udid ?? ""}…` };
@@ -160,17 +160,17 @@ class BootSimulatorTool implements Tool<BootInput> {
   }
 }
 
-/** Registers all XcodeKit language-model tools for AI agents. */
+/** Registers all XBridge language-model tools for AI agents. */
 export function registerLanguageModelTools(
   context: vscode.ExtensionContext,
-  manager: XcodeKitManager
+  manager: XBridgeManager
 ): void {
   context.subscriptions.push(
-    vscode.lm.registerTool("xcodekit_build", new BuildTool(manager)),
-    vscode.lm.registerTool("xcodekit_test", new TestTool(manager)),
-    vscode.lm.registerTool("xcodekit_run", new RunTool(manager)),
-    vscode.lm.registerTool("xcodekit_listSchemes", new ListSchemesTool(manager)),
-    vscode.lm.registerTool("xcodekit_listSimulators", new ListSimulatorsTool(manager)),
-    vscode.lm.registerTool("xcodekit_bootSimulator", new BootSimulatorTool(manager))
+    vscode.lm.registerTool("xbridge_build", new BuildTool(manager)),
+    vscode.lm.registerTool("xbridge_test", new TestTool(manager)),
+    vscode.lm.registerTool("xbridge_run", new RunTool(manager)),
+    vscode.lm.registerTool("xbridge_listSchemes", new ListSchemesTool(manager)),
+    vscode.lm.registerTool("xbridge_listSimulators", new ListSimulatorsTool(manager)),
+    vscode.lm.registerTool("xbridge_bootSimulator", new BootSimulatorTool(manager))
   );
 }

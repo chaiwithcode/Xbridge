@@ -126,7 +126,7 @@ export class XcodebuildService {
       throw new Error("No schemes found in the project.");
     }
     throw new Error(
-      `Multiple schemes available (${schemes.join(", ")}). Select one with "XcodeKit: Select Scheme".`
+      `Multiple schemes available (${schemes.join(", ")}). Select one with "XBridge: Select Scheme".`
     );
   }
 

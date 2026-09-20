@@ -3,7 +3,7 @@
 ## 1.3.0
 
 - Added complete extension identity and Marketplace metadata: author, homepage, gallery banner, pricing, Q&A, workspace runtime, trust capabilities, virtual-workspace limitations, and richer iOS/Swift discovery keywords.
-- Declared that XcodeKit requires a trusted local workspace because it runs `xcodebuild` and `xcrun` against local projects and simulators.
+- Declared that XBridge requires a trusted local workspace because it runs `xcodebuild` and `xcrun` against local projects and simulators.
 - Updated VSCE automation to package and publish non-interactively while the project has no verified public source repository.
 
 ## 1.2.1
@@ -19,10 +19,10 @@
 ## 1.2.0
 
 - **The Simulators view is now a real device panel.** Click any simulator to make it your run destination — a green check shows which one is active, booted devices are pinned to the top, and each device gets the right icon for its family (iPhone, iPad, Watch, TV, Vision). Right-click for the things you used to open Simulator.app for: open a URL or deep link, take a screenshot, record the screen, toggle light/dark appearance, open the app's data container, uninstall the app, copy the UDID or erase the device.
-- **See your app's logs.** The launched app's console output now streams live into the **XcodeKit App** output channel, and a status-bar pill shows what's running — click it to stop the app.
+- **See your app's logs.** The launched app's console output now streams live into the **XBridge App** output channel, and a status-bar pill shows what's running — click it to stop the app.
 - **Xcode-style keyboard shortcuts**: ⌃⌘B build, ⌃⌘R run, ⌃⌘U test, ⌃⌘K clean, ⌃⌘. stop, ⌃⌘D pick a destination.
 - **Jump straight to a failure.** When a build or test fails, click the status-bar pill to get a searchable list of every error, warning and test failure — pick one and land on the exact line. The Activity Bar icon also carries a badge with the error count.
-- **Builds stay out of your way.** Progress moved from a notification popup to the status bar, and the build log no longer steals focus (turn it back on with `xcodekit.autoRevealBuildLog`).
+- **Builds stay out of your way.** Progress moved from a notification popup to the status bar, and the build log no longer steals focus (turn it back on with `xbridge.autoRevealBuildLog`).
 - **Everything opens instantly.** Scheme and simulator lists are cached, so the sidebar, pickers and status bar no longer wait on `xcodebuild` for every redraw.
 - The **Build & Run** view now shows the detected project, and the long option lists are collapsed by default.
 - New **Getting Started** walkthrough, and a refresh button in the Test Explorer.
@@ -34,7 +34,7 @@
 
 ## 1.0.0
 
-- The XcodeKit sidebar now has expandable **Test Plans** and **Test Targets** sections, just like **Schemes** — browse and switch the active test plan or target with one click, without opening a picker.
+- The XBridge sidebar now has expandable **Test Plans** and **Test Targets** sections, just like **Schemes** — browse and switch the active test plan or target with one click, without opening a picker.
 
 ## 0.1.9
 

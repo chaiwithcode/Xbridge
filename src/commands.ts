@@ -2,7 +2,7 @@
 import * as vscode from "vscode";
 import * as os from "os";
 import * as path from "path";
-import { XcodeKitManager } from "./manager";
+import { XBridgeManager } from "./manager";
 import { ConfigService } from "./core/config";
 import { SimctlService, Simulator } from "./services/simctl";
 import { XcodebuildService } from "./services/xcodebuild";
@@ -13,7 +13,7 @@ import { SimulatorTreeProvider } from "./views/simulatorTree";
 import { StatusBar } from "./statusBar";
 
 interface Deps {
-  manager: XcodeKitManager;
+  manager: XBridgeManager;
   config: ConfigService;
   simctl: SimctlService;
   xcodebuild: XcodebuildService;
@@ -86,7 +86,7 @@ const recordings = new Map<
 
 class ActionBusyError extends Error {
   constructor() {
-    super("Another XcodeKit action is already running. Stop it before starting a new one.");
+    super("Another XBridge action is already running. Stop it before starting a new one.");
   }
 }
 
@@ -143,7 +143,7 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
   // Keep the toolbar/context in sync while an action runs.
   onRunningChanged = (running: boolean) => {
     statusBar.setRunning(running);
-    void vscode.commands.executeCommand("setContext", "xcodekit.running", running);
+    void vscode.commands.executeCommand("setContext", "xbridge.running", running);
   };
 
   /** Re-renders the UI from cached metadata. */
@@ -168,11 +168,11 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
   const fail = (e: unknown) => {
     const message = e instanceof Error ? e.message : String(e);
     if (e instanceof ActionBusyError) {
-      vscode.window.showWarningMessage(`XcodeKit: ${message}`);
+      vscode.window.showWarningMessage(`XBridge: ${message}`);
       return;
     }
     statusBar.showError(message);
-    vscode.window.showErrorMessage(`XcodeKit: ${message}`);
+    vscode.window.showErrorMessage(`XBridge: ${message}`);
   };
 
   /** Resolves the simulator a device command should act on. */
@@ -182,7 +182,7 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
     }
     const udid = config.destination;
     if (!udid) {
-      vscode.window.showWarningMessage("XcodeKit: No simulator selected.");
+      vscode.window.showWarningMessage("XBridge: No simulator selected.");
       return undefined;
     }
     return simctl.find(udid);
@@ -197,9 +197,9 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
 
   // ---------------------------------------------------------------- build
 
-  register("xcodekit.build", () =>
+  register("xbridge.build", () =>
     withActionProgress(
-      "XcodeKit: Building…",
+      "XBridge: Building…",
       async (token) => {
         statusBar.startActivity("Build");
         const result = await manager.build({}, (c) => statusBar.observeLog(c), token);
@@ -210,17 +210,17 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
           warnings: result.parsed.warnings.length,
         });
         if (result.succeeded) {
-          vscode.window.setStatusBarMessage("$(pass-filled) XcodeKit: Build succeeded", 4000);
+          vscode.window.setStatusBarMessage("$(pass-filled) XBridge: Build succeeded", 4000);
         } else {
           vscode.window
             .showErrorMessage(
-              `XcodeKit: Build failed with ${result.parsed.errors.length} error(s).`,
+              `XBridge: Build failed with ${result.parsed.errors.length} error(s).`,
               "Show Issues",
               "Show Output"
             )
             .then((choice) => {
               if (choice === "Show Issues") {
-                void vscode.commands.executeCommand("xcodekit.showIssues");
+                void vscode.commands.executeCommand("xbridge.showIssues");
               } else if (choice === "Show Output") {
                 log.build.show();
               }
@@ -231,9 +231,9 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
     ).catch(fail)
   );
 
-  register("xcodekit.clean", () =>
+  register("xbridge.clean", () =>
     withActionProgress(
-      "XcodeKit: Cleaning…",
+      "XBridge: Cleaning…",
       async (token) => {
         statusBar.startActivity("Clean");
         const result = await manager.clean(undefined, (c) => statusBar.observeLog(c), token);
@@ -244,10 +244,10 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
           warnings: result.parsed.warnings.length,
         });
         if (result.succeeded) {
-          vscode.window.setStatusBarMessage("$(pass-filled) XcodeKit: Clean finished", 4000);
+          vscode.window.setStatusBarMessage("$(pass-filled) XBridge: Clean finished", 4000);
         } else {
           vscode.window
-            .showErrorMessage("XcodeKit: Clean failed.", "Show Output")
+            .showErrorMessage("XBridge: Clean failed.", "Show Output")
             .then((choice) => choice && log.build.show());
         }
       },
@@ -255,9 +255,9 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
     ).catch(fail)
   );
 
-  register("xcodekit.run", () =>
+  register("xbridge.run", () =>
     withActionProgress(
-      "XcodeKit: Building & running…",
+      "XBridge: Building & running…",
       async (token) => {
         statusBar.startActivity("Run");
         const result = await manager.run({}, (c) => statusBar.observeLog(c), token);
@@ -269,8 +269,8 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
         });
         if (!result.succeeded) {
           vscode.window
-            .showErrorMessage(`XcodeKit: ${result.summary.split("\n")[0]}`, "Show Issues")
-            .then((c) => c && vscode.commands.executeCommand("xcodekit.showIssues"));
+            .showErrorMessage(`XBridge: ${result.summary.split("\n")[0]}`, "Show Issues")
+            .then((c) => c && vscode.commands.executeCommand("xbridge.showIssues"));
         }
         await reload();
       },
@@ -278,24 +278,24 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
     ).catch(fail)
   );
 
-  register("xcodekit.stop", async () => {
+  register("xbridge.stop", async () => {
     activeCancellation?.cancel();
     await manager.stopApp();
-    vscode.window.setStatusBarMessage("XcodeKit: Stopped", 3000);
+    vscode.window.setStatusBarMessage("XBridge: Stopped", 3000);
   });
 
-  register("xcodekit.stopApp", async () => {
+  register("xbridge.stopApp", async () => {
     const app = manager.runningApp;
     if (!app) {
-      vscode.window.showInformationMessage("XcodeKit: No app is running.");
+      vscode.window.showInformationMessage("XBridge: No app is running.");
       return;
     }
     await manager.stopApp().catch(fail);
   });
 
-  register("xcodekit.test", () =>
+  register("xbridge.test", () =>
     withActionProgress(
-      "XcodeKit: Building & testing…",
+      "XBridge: Building & testing…",
       async (token) => {
         statusBar.startActivity("Test");
         const result = await manager.test(
@@ -312,13 +312,13 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
         });
         if (result.succeeded) {
           vscode.window.setStatusBarMessage(
-            `$(pass-filled) XcodeKit: ${result.parsed.testSummary ?? "Tests passed"}`,
+            `$(pass-filled) XBridge: ${result.parsed.testSummary ?? "Tests passed"}`,
             5000
           );
         } else {
           vscode.window
-            .showErrorMessage(`XcodeKit: ${result.summary.split("\n")[0]}`, "Show Issues")
-            .then((c) => c && vscode.commands.executeCommand("xcodekit.showIssues"));
+            .showErrorMessage(`XBridge: ${result.summary.split("\n")[0]}`, "Show Issues")
+            .then((c) => c && vscode.commands.executeCommand("xbridge.showIssues"));
         }
       },
       () => statusBar.clearActivity()
@@ -327,7 +327,7 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
 
   // ---------------------------------------------------------------- issues
 
-  register("xcodekit.showIssues", async () => {
+  register("xbridge.showIssues", async () => {
     const parsed = manager.lastResult?.parsed;
     const issues = [
       ...(parsed?.errors ?? []).map((i) => ({ ...i, icon: "error" as const })),
@@ -341,7 +341,7 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
       ...(parsed?.warnings ?? []).map((i) => ({ ...i, icon: "warning" as const })),
     ];
     if (issues.length === 0) {
-      vscode.window.showInformationMessage("XcodeKit: No issues from the last build.");
+      vscode.window.showInformationMessage("XBridge: No issues from the last build.");
       log.build.show();
       return;
     }
@@ -369,7 +369,7 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
 
   // ---------------------------------------------------------------- pickers
 
-  register("xcodekit.selectScheme", async (preselected?: string) => {
+  register("xbridge.selectScheme", async (preselected?: string) => {
     let scheme = preselected;
     if (!scheme) {
       const pick = await pickAsync("Select a scheme", async () => {
@@ -386,7 +386,7 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
     }
   });
 
-  register("xcodekit.selectConfiguration", async () => {
+  register("xbridge.selectConfiguration", async () => {
     const pick = await pickAsync("Select a build configuration", async () => {
       const { configurations } = await xcodebuild
         .listSchemes()
@@ -399,7 +399,7 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
     }
   });
 
-  register("xcodekit.selectTestPlan", async (preselected?: string) => {
+  register("xbridge.selectTestPlan", async (preselected?: string) => {
     if (preselected !== undefined) {
       await config.setTestPlan(preselected || undefined);
       await rerender();
@@ -424,7 +424,7 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
     }
   });
 
-  register("xcodekit.selectTestTarget", async (preselected?: string) => {
+  register("xbridge.selectTestTarget", async (preselected?: string) => {
     if (preselected !== undefined) {
       await config.setTestTarget(preselected || undefined);
       await rerender();
@@ -457,7 +457,7 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
     }
   });
 
-  register("xcodekit.selectDestination", async () => {
+  register("xbridge.selectDestination", async () => {
     const active = config.destination;
     const pick = await pickAsync(
       "Select a destination (simulator)",
@@ -503,7 +503,7 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
   });
 
   /** Invoked by clicking a simulator row, so it becomes the run destination. */
-  register("xcodekit.setDestination", async (arg?: string | SimulatorContext) => {
+  register("xbridge.setDestination", async (arg?: string | SimulatorContext) => {
     const udid = typeof arg === "string" ? arg : arg?.simulator?.udid;
     if (!udid) {
       return;
@@ -514,19 +514,19 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
 
   // ---------------------------------------------------------------- devices
 
-  register("xcodekit.bootSimulator", async (item?: SimulatorContext) => {
+  register("xbridge.bootSimulator", async (item?: SimulatorContext) => {
     const sim = await targetSimulator(item);
     if (!sim) {
       return;
     }
-    await withDeviceProgress(`XcodeKit: Booting ${sim.name}…`, async () => {
+    await withDeviceProgress(`XBridge: Booting ${sim.name}…`, async () => {
       await simctl.boot(sim.udid);
       await simctl.openApp();
     }).catch(fail);
     await reload();
   });
 
-  register("xcodekit.shutdownSimulator", async (item?: SimulatorContext) => {
+  register("xbridge.shutdownSimulator", async (item?: SimulatorContext) => {
     const sim = await targetSimulator(item);
     if (!sim) {
       return;
@@ -535,7 +535,7 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
     await reload();
   });
 
-  register("xcodekit.eraseSimulator", async (item?: SimulatorContext) => {
+  register("xbridge.eraseSimulator", async (item?: SimulatorContext) => {
     const sim = await targetSimulator(item);
     if (!sim) {
       return;
@@ -546,21 +546,21 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
       "Erase"
     );
     if (confirm === "Erase") {
-      await withDeviceProgress(`XcodeKit: Erasing ${sim.name}…`, () => simctl.erase(sim.udid)).catch(fail);
+      await withDeviceProgress(`XBridge: Erasing ${sim.name}…`, () => simctl.erase(sim.udid)).catch(fail);
       await reload();
     }
   });
 
-  register("xcodekit.copySimulatorUdid", async (item?: SimulatorContext) => {
+  register("xbridge.copySimulatorUdid", async (item?: SimulatorContext) => {
     const sim = await targetSimulator(item);
     if (!sim) {
       return;
     }
     await vscode.env.clipboard.writeText(sim.udid);
-    vscode.window.setStatusBarMessage(`XcodeKit: Copied UDID for ${sim.name}`, 3000);
+    vscode.window.setStatusBarMessage(`XBridge: Copied UDID for ${sim.name}`, 3000);
   });
 
-  register("xcodekit.openUrlOnSimulator", async (item?: SimulatorContext) => {
+  register("xbridge.openUrlOnSimulator", async (item?: SimulatorContext) => {
     const sim = await targetSimulator(item);
     if (!sim) {
       return;
@@ -575,24 +575,24 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
     if (!url) {
       return;
     }
-    await withDeviceProgress(`XcodeKit: Opening link on ${sim.name}…`, async () => {
+    await withDeviceProgress(`XBridge: Opening link on ${sim.name}…`, async () => {
       await simctl.boot(sim.udid);
       await simctl.openUrl(sim.udid, url.trim());
     }).catch(fail);
   });
 
-  register("xcodekit.screenshotSimulator", async (item?: SimulatorContext) => {
+  register("xbridge.screenshotSimulator", async (item?: SimulatorContext) => {
     const sim = await targetSimulator(item);
     if (!sim) {
       return;
     }
     if (sim.state !== "Booted") {
-      vscode.window.showWarningMessage(`XcodeKit: Boot ${sim.name} before taking a screenshot.`);
+      vscode.window.showWarningMessage(`XBridge: Boot ${sim.name} before taking a screenshot.`);
       return;
     }
     const file = timestamped(sim.name.replace(/\s+/g, "-"), "png");
     try {
-      await withDeviceProgress("XcodeKit: Capturing screenshot…", () =>
+      await withDeviceProgress("XBridge: Capturing screenshot…", () =>
         simctl.screenshot(sim.udid, file)
       );
     } catch (err) {
@@ -601,11 +601,11 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
     }
     await vscode.commands.executeCommand("vscode.open", vscode.Uri.file(file));
     vscode.window
-      .showInformationMessage("XcodeKit: Screenshot captured.", "Reveal in Finder")
+      .showInformationMessage("XBridge: Screenshot captured.", "Reveal in Finder")
       .then((c) => c && revealInFinder(file));
   });
 
-  register("xcodekit.toggleRecording", async (item?: SimulatorContext) => {
+  register("xbridge.toggleRecording", async (item?: SimulatorContext) => {
     const sim = await targetSimulator(item);
     if (!sim) {
       return;
@@ -619,19 +619,19 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
       recordings.delete(sim.udid);
       simulatorTree.setRecording(sim.udid, false);
       vscode.window
-        .showInformationMessage("XcodeKit: Recording saved.", "Reveal in Finder")
+        .showInformationMessage("XBridge: Recording saved.", "Reveal in Finder")
         .then((c) => c && revealInFinder(existing.file));
       return;
     }
     if (sim.state !== "Booted") {
-      vscode.window.showWarningMessage(`XcodeKit: Boot ${sim.name} before recording.`);
+      vscode.window.showWarningMessage(`XBridge: Boot ${sim.name} before recording.`);
       return;
     }
     const file = timestamped(sim.name.replace(/\s+/g, "-"), "mp4");
     const process = simctl.startRecording(sim.udid, file);
     recordings.set(sim.udid, { process, file, stopping: false });
     simulatorTree.setRecording(sim.udid, true);
-    vscode.window.setStatusBarMessage(`$(record) XcodeKit: Recording ${sim.name}…`, 4000);
+    vscode.window.setStatusBarMessage(`$(record) XBridge: Recording ${sim.name}…`, 4000);
     void process.promise
       .catch((err) => log.error("Screen recording process failed", err))
       .finally(() => {
@@ -643,37 +643,37 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
         simulatorTree.setRecording(sim.udid, false);
         if (!current.stopping) {
           vscode.window.showWarningMessage(
-            `XcodeKit: Screen recording on ${sim.name} stopped unexpectedly.`
+            `XBridge: Screen recording on ${sim.name} stopped unexpectedly.`
           );
         }
       });
   });
 
-  register("xcodekit.toggleAppearance", async (item?: SimulatorContext) => {
+  register("xbridge.toggleAppearance", async (item?: SimulatorContext) => {
     const sim = await targetSimulator(item);
     if (!sim) {
       return;
     }
     if (sim.state !== "Booted") {
-      vscode.window.showWarningMessage(`XcodeKit: Boot ${sim.name} to change its appearance.`);
+      vscode.window.showWarningMessage(`XBridge: Boot ${sim.name} to change its appearance.`);
       return;
     }
     try {
       const current = await simctl.getAppearance(sim.udid);
       const next = current === "dark" ? "light" : "dark";
       await simctl.setAppearance(sim.udid, next);
-      vscode.window.setStatusBarMessage(`XcodeKit: ${sim.name} switched to ${next} mode`, 3000);
+      vscode.window.setStatusBarMessage(`XBridge: ${sim.name} switched to ${next} mode`, 3000);
     } catch (e) {
       fail(e);
     }
   });
 
-  register("xcodekit.openAppContainer", async (item?: SimulatorContext) => {
+  register("xbridge.openAppContainer", async (item?: SimulatorContext) => {
     const sim = await targetSimulator(item);
     if (!sim) {
       return;
     }
-    await withDeviceProgress("XcodeKit: Locating app container…", async () => {
+    await withDeviceProgress("XBridge: Locating app container…", async () => {
       const bundleId = manager.runningApp?.bundleId ?? (await resolveBundleId());
       if (!bundleId) {
         throw new Error("Could not resolve the app's bundle identifier.");
@@ -683,64 +683,64 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
     }).catch(fail);
   });
 
-  register("xcodekit.uninstallApp", async (item?: SimulatorContext) => {
+  register("xbridge.uninstallApp", async (item?: SimulatorContext) => {
     const sim = await targetSimulator(item);
     if (!sim) {
       return;
     }
-    await withDeviceProgress("XcodeKit: Uninstalling app…", async () => {
+    await withDeviceProgress("XBridge: Uninstalling app…", async () => {
       const bundleId = manager.runningApp?.bundleId ?? (await resolveBundleId());
       if (!bundleId) {
         throw new Error("Could not resolve the app's bundle identifier.");
       }
       await simctl.uninstall(sim.udid, bundleId);
-      vscode.window.setStatusBarMessage(`XcodeKit: Uninstalled ${bundleId}`, 3000);
+      vscode.window.setStatusBarMessage(`XBridge: Uninstalled ${bundleId}`, 3000);
     }).catch(fail);
   });
 
   // ---------------------------------------------------------------- misc
 
-  register("xcodekit.openSimulatorApp", () => simctl.openApp());
-  register("xcodekit.refreshSimulators", () => simulatorTree.refresh());
-  register("xcodekit.refreshSchemes", () => void reload());
-  register("xcodekit.showOutput", () => log.build.show());
-  register("xcodekit.showAppLog", () => log.app.show());
-  register("xcodekit.openWalkthrough", () =>
+  register("xbridge.openSimulatorApp", () => simctl.openApp());
+  register("xbridge.refreshSimulators", () => simulatorTree.refresh());
+  register("xbridge.refreshSchemes", () => void reload());
+  register("xbridge.showOutput", () => log.build.show());
+  register("xbridge.showAppLog", () => log.app.show());
+  register("xbridge.openWalkthrough", () =>
     vscode.commands.executeCommand(
       "workbench.action.openWalkthrough",
-      `${context.extension.id}#xcodekit.welcome`,
+      `${context.extension.id}#xbridge.welcome`,
       false
     )
   );
 
   // Xcode-style combined selector: pick which of scheme/configuration/destination to change.
-  register("xcodekit.selectTarget", async () => {
+  register("xbridge.selectTarget", async () => {
     const pick = await vscode.window.showQuickPick(
       [
         {
           label: "$(target) Scheme",
           description: config.scheme ?? "not set",
-          command: "xcodekit.selectScheme",
+          command: "xbridge.selectScheme",
         },
         {
           label: "$(settings-gear) Configuration",
           description: config.configuration,
-          command: "xcodekit.selectConfiguration",
+          command: "xbridge.selectConfiguration",
         },
         {
           label: "$(device-mobile) Destination",
           description: "simulator",
-          command: "xcodekit.selectDestination",
+          command: "xbridge.selectDestination",
         },
         {
           label: "$(checklist) Test Plan",
           description: config.testPlan ?? "Default",
-          command: "xcodekit.selectTestPlan",
+          command: "xbridge.selectTestPlan",
         },
         {
           label: "$(beaker) Test Target",
           description: config.testTarget ?? "All Tests",
-          command: "xcodekit.selectTestTarget",
+          command: "xbridge.selectTestTarget",
         },
       ],
       { placeHolder: "What do you want to change?" }
@@ -751,7 +751,7 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
   });
 
   // Pick an Xcode project/workspace when none is auto-detected.
-  register("xcodekit.selectProject", async () => {
+  register("xbridge.selectProject", async () => {
     const picks = await vscode.window.showOpenDialog({
       canSelectFiles: true,
       canSelectFolders: true,
@@ -762,7 +762,7 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
     const chosen = picks?.[0];
     if (chosen) {
       await vscode.workspace
-        .getConfiguration("xcodekit")
+        .getConfiguration("xbridge")
         .update("projectPath", chosen.fsPath, vscode.ConfigurationTarget.Workspace);
       await updateHasProjectContext(config);
       await reload();
@@ -783,7 +783,7 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
   void updateHasProjectContext(config);
 }
 
-/** Sets the `xcodekit.hasProject` context key that drives the welcome view. */
+/** Sets the `xbridge.hasProject` context key that drives the welcome view. */
 export async function updateHasProjectContext(config: ConfigService): Promise<boolean> {
   let hasProject = false;
   try {
@@ -792,6 +792,6 @@ export async function updateHasProjectContext(config: ConfigService): Promise<bo
   } catch {
     hasProject = false;
   }
-  await vscode.commands.executeCommand("setContext", "xcodekit.hasProject", hasProject);
+  await vscode.commands.executeCommand("setContext", "xbridge.hasProject", hasProject);
   return hasProject;
 }

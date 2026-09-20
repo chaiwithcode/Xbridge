@@ -89,42 +89,42 @@ export class SchemeTreeProvider implements vscode.TreeDataProvider<Node> {
         "Project",
         project,
         "folder-opened",
-        "xcodekit.selectProject",
+        "xbridge.selectProject",
         "Choose the .xcodeproj or .xcworkspace to work with"
       ),
       new SettingItem(
         "Scheme",
         this.config.scheme ?? "Select…",
         "target",
-        "xcodekit.selectScheme",
+        "xbridge.selectScheme",
         "Select the scheme to build, run and test"
       ),
       new SettingItem(
         "Configuration",
         this.config.configuration,
         "settings-gear",
-        "xcodekit.selectConfiguration",
+        "xbridge.selectConfiguration",
         "Select the build configuration (Debug/Release)"
       ),
       new SettingItem(
         "Destination",
         destination,
         "device-mobile",
-        "xcodekit.selectDestination",
+        "xbridge.selectDestination",
         "Select the simulator or device to run on"
       ),
       new SettingItem(
         "Test Plan",
         this.config.testPlan ?? "Default",
         "checklist",
-        "xcodekit.selectTestPlan",
+        "xbridge.selectTestPlan",
         "Select the test plan to run (or the scheme default)"
       ),
       new SettingItem(
         "Test Target",
         this.config.testTarget ?? "All Tests",
         "beaker",
-        "xcodekit.selectTestTarget",
+        "xbridge.selectTestTarget",
         "Select which test target to run (or all tests)"
       ),
       new GroupItem("Schemes", "schemes", "list-tree"),
@@ -143,18 +143,18 @@ export class SchemeTreeProvider implements vscode.TreeDataProvider<Node> {
           }
           const active = this.config.scheme;
           return schemes.map(
-            (s) => new ChoiceItem(s, s, "target", s === active, "xcodekit.selectScheme")
+            (s) => new ChoiceItem(s, s, "target", s === active, "xbridge.selectScheme")
           );
         }
         case "testPlans": {
           const plans = await this.xcodebuild.listTestPlans();
           const active = this.config.testPlan;
           const items: Node[] = [
-            new ChoiceItem("Default", "", "circle-large-outline", !active, "xcodekit.selectTestPlan"),
+            new ChoiceItem("Default", "", "circle-large-outline", !active, "xbridge.selectTestPlan"),
           ];
           for (const p of plans) {
             items.push(
-              new ChoiceItem(p, p, "checklist", p === active, "xcodekit.selectTestPlan")
+              new ChoiceItem(p, p, "checklist", p === active, "xbridge.selectTestPlan")
             );
           }
           return items;
@@ -163,16 +163,16 @@ export class SchemeTreeProvider implements vscode.TreeDataProvider<Node> {
           const targets = await this.xcodebuild.listTestTargets();
           const active = this.config.testTarget;
           const items: Node[] = [
-            new ChoiceItem("All Tests", "", "beaker", !active, "xcodekit.selectTestTarget"),
+            new ChoiceItem("All Tests", "", "beaker", !active, "xbridge.selectTestTarget"),
           ];
           for (const t of targets.unit) {
             items.push(
-              new ChoiceItem(t, t, "beaker", t === active, "xcodekit.selectTestTarget")
+              new ChoiceItem(t, t, "beaker", t === active, "xbridge.selectTestTarget")
             );
           }
           for (const t of targets.ui) {
             items.push(
-              new ChoiceItem(t, t, "device-mobile", t === active, "xcodekit.selectTestTarget")
+              new ChoiceItem(t, t, "device-mobile", t === active, "xbridge.selectTestTarget")
             );
           }
           return items;

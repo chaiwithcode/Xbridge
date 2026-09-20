@@ -21,7 +21,7 @@ export interface RunResultInfo extends ActionResult {
   appPath?: string;
 }
 
-/** The app currently installed and launched by XcodeKit. */
+/** The app currently installed and launched by XBridge. */
 export interface AppSession {
   udid: string;
   bundleId: string;
@@ -32,7 +32,7 @@ export interface AppSession {
  * High-level orchestration of build / run / test used by both interactive
  * commands and the AI language-model tools, so behavior stays consistent.
  */
-export class XcodeKitManager {
+export class XBridgeManager {
   readonly diagnostics: vscode.DiagnosticCollection;
 
   /** The most recent build/test result, used to drive badges and the issue list. */
@@ -50,7 +50,7 @@ export class XcodeKitManager {
     readonly xcodebuild: XcodebuildService,
     readonly simctl: SimctlService
   ) {
-    this.diagnostics = vscode.languages.createDiagnosticCollection("xcodekit");
+    this.diagnostics = vscode.languages.createDiagnosticCollection("xbridge");
   }
 
   dispose(): void {
@@ -97,7 +97,7 @@ export class XcodeKitManager {
           ? vscode.DiagnosticSeverity.Error
           : vscode.DiagnosticSeverity.Warning
       );
-      diag.source = "xcodekit";
+      diag.source = "xbridge";
       const list = byFile.get(issue.file) ?? [];
       list.push(diag);
       byFile.set(issue.file, list);
@@ -113,7 +113,7 @@ export class XcodeKitManager {
         failure.testCase ? `${failure.testCase}: ${failure.message}` : failure.message,
         vscode.DiagnosticSeverity.Error
       );
-      diag.source = "xcodekit (test)";
+      diag.source = "xbridge (test)";
       const list = byFile.get(failure.file) ?? [];
       list.push(diag);
       byFile.set(failure.file, list);

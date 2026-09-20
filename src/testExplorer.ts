@@ -1,6 +1,6 @@
 //  Created by Deepak Sharma on 13/07/2026.
 import * as vscode from "vscode";
-import { XcodeKitManager } from "./manager";
+import { XBridgeManager } from "./manager";
 import { XcodebuildService } from "./services/xcodebuild";
 
 interface DiscoveredMethod {
@@ -86,10 +86,10 @@ function parseSwiftTests(text: string): DiscoveredClass[] {
  */
 export function registerTestExplorer(
   context: vscode.ExtensionContext,
-  manager: XcodeKitManager,
+  manager: XBridgeManager,
   xcodebuild: XcodebuildService
 ): void {
-  const controller = vscode.tests.createTestController("xcodekit.tests", "XcodeKit Tests");
+  const controller = vscode.tests.createTestController("xbridge.tests", "XBridge Tests");
   context.subscriptions.push(controller);
 
   const fileTests = new Map<string, vscode.TestItem>();

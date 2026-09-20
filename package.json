@@ -1,6 +1,6 @@
 {
-  "name": "xcodekit",
-  "displayName": "XcodeKit",
+  "name": "xbridge",
+  "displayName": "XBridge",
   "description": "Build, run, test and manage iOS/macOS Xcode projects and simulators directly from VS Code — with first-class AI agent tools.",
   "version": "1.3.0",
   "publisher": "mithlesh",
@@ -8,7 +8,7 @@
     "name": "Deepak Sharma"
   },
   "license": "MIT",
-  "homepage": "https://marketplace.visualstudio.com/items?itemName=mithlesh.xcodekit",
+  "homepage": "https://marketplace.visualstudio.com/items?itemName=mithlesh.xbridge",
   "icon": "media/icon.png",
   "galleryBanner": {
     "color": "#0A84FF",
@@ -23,7 +23,7 @@
   "capabilities": {
     "untrustedWorkspaces": {
       "supported": false,
-      "description": "XcodeKit executes xcodebuild and xcrun commands from the current workspace."
+      "description": "XBridge executes xcodebuild and xcrun commands from the current workspace."
     },
     "virtualWorkspaces": {
       "supported": false,
@@ -62,45 +62,45 @@
   "main": "./dist/extension.js",
   "contributes": {
     "configuration": {
-      "title": "XcodeKit",
+      "title": "XBridge",
       "properties": {
-        "xcodekit.projectPath": {
+        "xbridge.projectPath": {
           "type": "string",
           "default": "",
           "description": "Path to the .xcodeproj or .xcworkspace to use. Leave empty to auto-detect."
         },
-        "xcodekit.scheme": {
+        "xbridge.scheme": {
           "type": "string",
           "default": "",
           "description": "The default Xcode scheme to build/run/test."
         },
-        "xcodekit.configuration": {
+        "xbridge.configuration": {
           "type": "string",
           "default": "Debug",
           "description": "Build configuration (e.g. Debug, Release)."
         },
-        "xcodekit.destination": {
+        "xbridge.destination": {
           "type": "string",
           "default": "",
           "description": "The selected simulator/device destination UDID. Leave empty to select interactively."
         },
-        "xcodekit.testPlan": {
+        "xbridge.testPlan": {
           "type": "string",
           "default": "",
           "description": "The selected test plan (.xctestplan base name) to run. Leave empty to use the scheme's default."
         },
-        "xcodekit.testTarget": {
+        "xbridge.testTarget": {
           "type": "string",
           "default": "",
           "description": "The selected test target to run. Leave empty to run all tests."
         },
-        "xcodekit.derivedDataPath": {
+        "xbridge.derivedDataPath": {
           "type": "string",
           "default": "",
           "scope": "machine-overridable",
           "description": "Custom derivedData path. Leave empty to use the default under the workspace (.build/DerivedData)."
         },
-        "xcodekit.extraBuildArgs": {
+        "xbridge.extraBuildArgs": {
           "type": "array",
           "items": {
             "type": "string"
@@ -108,17 +108,17 @@
           "default": [],
           "description": "Extra arguments appended to every xcodebuild invocation."
         },
-        "xcodekit.streamAppLogs": {
+        "xbridge.streamAppLogs": {
           "type": "boolean",
           "default": true,
-          "description": "Stream the launched app's console output into the 'XcodeKit App' output channel."
+          "description": "Stream the launched app's console output into the 'XBridge App' output channel."
         },
-        "xcodekit.openSimulatorOnRun": {
+        "xbridge.openSimulatorOnRun": {
           "type": "boolean",
           "default": true,
           "description": "Bring Simulator.app to the front when the app is launched."
         },
-        "xcodekit.autoRevealBuildLog": {
+        "xbridge.autoRevealBuildLog": {
           "type": "boolean",
           "default": false,
           "description": "Open the build log panel automatically whenever a build, test or clean starts."
@@ -127,433 +127,433 @@
     },
     "commands": [
       {
-        "command": "xcodekit.build",
+        "command": "xbridge.build",
         "title": "Build",
-        "category": "XcodeKit",
+        "category": "XBridge",
         "icon": "$(tools)"
       },
       {
-        "command": "xcodekit.clean",
+        "command": "xbridge.clean",
         "title": "Clean Build Folder",
-        "category": "XcodeKit",
+        "category": "XBridge",
         "icon": "$(trash)"
       },
       {
-        "command": "xcodekit.run",
+        "command": "xbridge.run",
         "title": "Build & Run",
-        "category": "XcodeKit",
+        "category": "XBridge",
         "icon": "$(play)"
       },
       {
-        "command": "xcodekit.stop",
+        "command": "xbridge.stop",
         "title": "Stop",
-        "category": "XcodeKit",
+        "category": "XBridge",
         "icon": "$(debug-stop)"
       },
       {
-        "command": "xcodekit.stopApp",
+        "command": "xbridge.stopApp",
         "title": "Stop Running App",
-        "category": "XcodeKit",
+        "category": "XBridge",
         "icon": "$(debug-stop)"
       },
       {
-        "command": "xcodekit.test",
+        "command": "xbridge.test",
         "title": "Run Tests",
-        "category": "XcodeKit",
+        "category": "XBridge",
         "icon": "$(beaker)"
       },
       {
-        "command": "xcodekit.selectScheme",
+        "command": "xbridge.selectScheme",
         "title": "Select Scheme",
-        "category": "XcodeKit"
+        "category": "XBridge"
       },
       {
-        "command": "xcodekit.selectConfiguration",
+        "command": "xbridge.selectConfiguration",
         "title": "Select Build Configuration",
-        "category": "XcodeKit"
+        "category": "XBridge"
       },
       {
-        "command": "xcodekit.selectDestination",
+        "command": "xbridge.selectDestination",
         "title": "Select Destination (Simulator/Device)",
-        "category": "XcodeKit"
+        "category": "XBridge"
       },
       {
-        "command": "xcodekit.bootSimulator",
+        "command": "xbridge.bootSimulator",
         "title": "Boot Simulator",
-        "category": "XcodeKit",
+        "category": "XBridge",
         "icon": "$(vm-running)"
       },
       {
-        "command": "xcodekit.shutdownSimulator",
+        "command": "xbridge.shutdownSimulator",
         "title": "Shutdown Simulator",
-        "category": "XcodeKit",
+        "category": "XBridge",
         "icon": "$(vm-outline)"
       },
       {
-        "command": "xcodekit.openSimulatorApp",
+        "command": "xbridge.openSimulatorApp",
         "title": "Open Simulator.app",
-        "category": "XcodeKit",
+        "category": "XBridge",
         "icon": "$(device-mobile)"
       },
       {
-        "command": "xcodekit.eraseSimulator",
+        "command": "xbridge.eraseSimulator",
         "title": "Erase Simulator Content",
-        "category": "XcodeKit"
+        "category": "XBridge"
       },
       {
-        "command": "xcodekit.refreshSimulators",
+        "command": "xbridge.refreshSimulators",
         "title": "Refresh Simulators",
-        "category": "XcodeKit",
+        "category": "XBridge",
         "icon": "$(refresh)"
       },
       {
-        "command": "xcodekit.refreshSchemes",
+        "command": "xbridge.refreshSchemes",
         "title": "Refresh Schemes",
-        "category": "XcodeKit",
+        "category": "XBridge",
         "icon": "$(refresh)"
       },
       {
-        "command": "xcodekit.showOutput",
+        "command": "xbridge.showOutput",
         "title": "Show Build Output",
-        "category": "XcodeKit",
+        "category": "XBridge",
         "icon": "$(output)"
       },
       {
-        "command": "xcodekit.selectTarget",
+        "command": "xbridge.selectTarget",
         "title": "Select Scheme, Configuration or Destination",
-        "category": "XcodeKit",
+        "category": "XBridge",
         "icon": "$(target)"
       },
       {
-        "command": "xcodekit.selectProject",
+        "command": "xbridge.selectProject",
         "title": "Select Xcode Project or Workspace",
-        "category": "XcodeKit",
+        "category": "XBridge",
         "icon": "$(folder-opened)"
       },
       {
-        "command": "xcodekit.selectTestPlan",
+        "command": "xbridge.selectTestPlan",
         "title": "Select Test Plan",
-        "category": "XcodeKit",
+        "category": "XBridge",
         "icon": "$(checklist)"
       },
       {
-        "command": "xcodekit.selectTestTarget",
+        "command": "xbridge.selectTestTarget",
         "title": "Select Test Target",
-        "category": "XcodeKit",
+        "category": "XBridge",
         "icon": "$(beaker)"
       },
       {
-        "command": "xcodekit.showIssues",
+        "command": "xbridge.showIssues",
         "title": "Show Build Issues",
-        "category": "XcodeKit",
+        "category": "XBridge",
         "icon": "$(list-flat)"
       },
       {
-        "command": "xcodekit.showAppLog",
+        "command": "xbridge.showAppLog",
         "title": "Show App Console",
-        "category": "XcodeKit",
+        "category": "XBridge",
         "icon": "$(terminal)"
       },
       {
-        "command": "xcodekit.setDestination",
+        "command": "xbridge.setDestination",
         "title": "Set as Destination",
-        "category": "XcodeKit",
+        "category": "XBridge",
         "icon": "$(pass)"
       },
       {
-        "command": "xcodekit.copySimulatorUdid",
+        "command": "xbridge.copySimulatorUdid",
         "title": "Copy Simulator UDID",
-        "category": "XcodeKit",
+        "category": "XBridge",
         "icon": "$(copy)"
       },
       {
-        "command": "xcodekit.openUrlOnSimulator",
+        "command": "xbridge.openUrlOnSimulator",
         "title": "Open URL or Deep Link…",
-        "category": "XcodeKit",
+        "category": "XBridge",
         "icon": "$(link)"
       },
       {
-        "command": "xcodekit.screenshotSimulator",
+        "command": "xbridge.screenshotSimulator",
         "title": "Take Screenshot",
-        "category": "XcodeKit",
+        "category": "XBridge",
         "icon": "$(device-camera)"
       },
       {
-        "command": "xcodekit.toggleRecording",
+        "command": "xbridge.toggleRecording",
         "title": "Start / Stop Screen Recording",
-        "category": "XcodeKit",
+        "category": "XBridge",
         "icon": "$(record)"
       },
       {
-        "command": "xcodekit.toggleAppearance",
+        "command": "xbridge.toggleAppearance",
         "title": "Toggle Light / Dark Appearance",
-        "category": "XcodeKit",
+        "category": "XBridge",
         "icon": "$(color-mode)"
       },
       {
-        "command": "xcodekit.openAppContainer",
+        "command": "xbridge.openAppContainer",
         "title": "Open App Data Container",
-        "category": "XcodeKit",
+        "category": "XBridge",
         "icon": "$(folder-opened)"
       },
       {
-        "command": "xcodekit.uninstallApp",
+        "command": "xbridge.uninstallApp",
         "title": "Uninstall App from Simulator",
-        "category": "XcodeKit",
+        "category": "XBridge",
         "icon": "$(trash)"
       },
       {
-        "command": "xcodekit.openWalkthrough",
+        "command": "xbridge.openWalkthrough",
         "title": "Getting Started",
-        "category": "XcodeKit",
+        "category": "XBridge",
         "icon": "$(book)"
       }
     ],
     "keybindings": [
       {
-        "command": "xcodekit.build",
+        "command": "xbridge.build",
         "key": "ctrl+cmd+b",
         "mac": "ctrl+cmd+b",
-        "when": "xcodekit.hasProject && !xcodekit.running"
+        "when": "xbridge.hasProject && !xbridge.running"
       },
       {
-        "command": "xcodekit.run",
+        "command": "xbridge.run",
         "key": "ctrl+cmd+r",
         "mac": "ctrl+cmd+r",
-        "when": "xcodekit.hasProject && !xcodekit.running"
+        "when": "xbridge.hasProject && !xbridge.running"
       },
       {
-        "command": "xcodekit.test",
+        "command": "xbridge.test",
         "key": "ctrl+cmd+u",
         "mac": "ctrl+cmd+u",
-        "when": "xcodekit.hasProject && !xcodekit.running"
+        "when": "xbridge.hasProject && !xbridge.running"
       },
       {
-        "command": "xcodekit.clean",
+        "command": "xbridge.clean",
         "key": "ctrl+cmd+k",
         "mac": "ctrl+cmd+k",
-        "when": "xcodekit.hasProject && !xcodekit.running"
+        "when": "xbridge.hasProject && !xbridge.running"
       },
       {
-        "command": "xcodekit.stop",
+        "command": "xbridge.stop",
         "key": "ctrl+cmd+.",
         "mac": "ctrl+cmd+.",
-        "when": "xcodekit.running || xcodekit.appRunning"
+        "when": "xbridge.running || xbridge.appRunning"
       },
       {
-        "command": "xcodekit.selectDestination",
+        "command": "xbridge.selectDestination",
         "key": "ctrl+cmd+d",
         "mac": "ctrl+cmd+d",
-        "when": "xcodekit.hasProject"
+        "when": "xbridge.hasProject"
       }
     ],
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "xcodekit",
-          "title": "XcodeKit",
+          "id": "xbridge",
+          "title": "XBridge",
           "icon": "media/activity.svg"
         }
       ]
     },
     "views": {
-      "xcodekit": [
+      "xbridge": [
         {
-          "id": "xcodekit.schemes",
+          "id": "xbridge.schemes",
           "name": "Build & Run",
           "icon": "$(target)",
-          "contextualTitle": "XcodeKit"
+          "contextualTitle": "XBridge"
         },
         {
-          "id": "xcodekit.simulators",
+          "id": "xbridge.simulators",
           "name": "Simulators",
           "icon": "$(device-mobile)",
-          "contextualTitle": "XcodeKit"
+          "contextualTitle": "XBridge"
         }
       ]
     },
     "viewsWelcome": [
       {
-        "view": "xcodekit.schemes",
-        "when": "!xcodekit.hasProject",
-        "contents": "No Xcode project or workspace was found in this folder.\n\n[Select Xcode Project…](command:xcodekit.selectProject)\n\nOpen a folder that contains an `.xcodeproj`, `.xcworkspace`, or `Package.swift`, or pick one manually above.\n\n[Take the tour](command:xcodekit.openWalkthrough)"
+        "view": "xbridge.schemes",
+        "when": "!xbridge.hasProject",
+        "contents": "No Xcode project or workspace was found in this folder.\n\n[Select Xcode Project…](command:xbridge.selectProject)\n\nOpen a folder that contains an `.xcodeproj`, `.xcworkspace`, or `Package.swift`, or pick one manually above.\n\n[Take the tour](command:xbridge.openWalkthrough)"
       }
     ],
     "menus": {
       "commandPalette": [
         {
-          "command": "xcodekit.setDestination",
+          "command": "xbridge.setDestination",
           "when": "false"
         }
       ],
       "view/title": [
         {
-          "command": "xcodekit.run",
-          "when": "view == xcodekit.schemes && !xcodekit.running",
+          "command": "xbridge.run",
+          "when": "view == xbridge.schemes && !xbridge.running",
           "group": "navigation@1"
         },
         {
-          "command": "xcodekit.stop",
-          "when": "view == xcodekit.schemes && xcodekit.running",
+          "command": "xbridge.stop",
+          "when": "view == xbridge.schemes && xbridge.running",
           "group": "navigation@1"
         },
         {
-          "command": "xcodekit.build",
-          "when": "view == xcodekit.schemes && !xcodekit.running",
+          "command": "xbridge.build",
+          "when": "view == xbridge.schemes && !xbridge.running",
           "group": "navigation@2"
         },
         {
-          "command": "xcodekit.test",
-          "when": "view == xcodekit.schemes && !xcodekit.running",
+          "command": "xbridge.test",
+          "when": "view == xbridge.schemes && !xbridge.running",
           "group": "navigation@3"
         },
         {
-          "command": "xcodekit.stopApp",
-          "when": "view == xcodekit.schemes && xcodekit.appRunning",
+          "command": "xbridge.stopApp",
+          "when": "view == xbridge.schemes && xbridge.appRunning",
           "group": "navigation@4"
         },
         {
-          "command": "xcodekit.refreshSchemes",
-          "when": "view == xcodekit.schemes",
+          "command": "xbridge.refreshSchemes",
+          "when": "view == xbridge.schemes",
           "group": "navigation@5"
         },
         {
-          "command": "xcodekit.clean",
-          "when": "view == xcodekit.schemes && !xcodekit.running",
+          "command": "xbridge.clean",
+          "when": "view == xbridge.schemes && !xbridge.running",
           "group": "1_build@1"
         },
         {
-          "command": "xcodekit.showOutput",
-          "when": "view == xcodekit.schemes",
+          "command": "xbridge.showOutput",
+          "when": "view == xbridge.schemes",
           "group": "1_build@2"
         },
         {
-          "command": "xcodekit.showAppLog",
-          "when": "view == xcodekit.schemes",
+          "command": "xbridge.showAppLog",
+          "when": "view == xbridge.schemes",
           "group": "1_build@3"
         },
         {
-          "command": "xcodekit.showIssues",
-          "when": "view == xcodekit.schemes",
+          "command": "xbridge.showIssues",
+          "when": "view == xbridge.schemes",
           "group": "1_build@4"
         },
         {
-          "command": "xcodekit.selectScheme",
-          "when": "view == xcodekit.schemes",
+          "command": "xbridge.selectScheme",
+          "when": "view == xbridge.schemes",
           "group": "2_config@1"
         },
         {
-          "command": "xcodekit.selectConfiguration",
-          "when": "view == xcodekit.schemes",
+          "command": "xbridge.selectConfiguration",
+          "when": "view == xbridge.schemes",
           "group": "2_config@2"
         },
         {
-          "command": "xcodekit.selectDestination",
-          "when": "view == xcodekit.schemes",
+          "command": "xbridge.selectDestination",
+          "when": "view == xbridge.schemes",
           "group": "2_config@3"
         },
         {
-          "command": "xcodekit.selectTestPlan",
-          "when": "view == xcodekit.schemes",
+          "command": "xbridge.selectTestPlan",
+          "when": "view == xbridge.schemes",
           "group": "2_config@4"
         },
         {
-          "command": "xcodekit.selectTestTarget",
-          "when": "view == xcodekit.schemes",
+          "command": "xbridge.selectTestTarget",
+          "when": "view == xbridge.schemes",
           "group": "2_config@5"
         },
         {
-          "command": "xcodekit.selectProject",
-          "when": "view == xcodekit.schemes",
+          "command": "xbridge.selectProject",
+          "when": "view == xbridge.schemes",
           "group": "3_project@1"
         },
         {
-          "command": "xcodekit.refreshSimulators",
-          "when": "view == xcodekit.simulators",
+          "command": "xbridge.refreshSimulators",
+          "when": "view == xbridge.simulators",
           "group": "navigation@1"
         },
         {
-          "command": "xcodekit.openSimulatorApp",
-          "when": "view == xcodekit.simulators",
+          "command": "xbridge.openSimulatorApp",
+          "when": "view == xbridge.simulators",
           "group": "navigation@2"
         }
       ],
       "view/item/context": [
         {
-          "command": "xcodekit.bootSimulator",
-          "when": "view == xcodekit.simulators && viewItem =~ /\\.shutdown\\./",
+          "command": "xbridge.bootSimulator",
+          "when": "view == xbridge.simulators && viewItem =~ /\\.shutdown\\./",
           "group": "inline@1"
         },
         {
-          "command": "xcodekit.shutdownSimulator",
-          "when": "view == xcodekit.simulators && viewItem =~ /\\.booted\\./",
+          "command": "xbridge.shutdownSimulator",
+          "when": "view == xbridge.simulators && viewItem =~ /\\.booted\\./",
           "group": "inline@1"
         },
         {
-          "command": "xcodekit.screenshotSimulator",
-          "when": "view == xcodekit.simulators && viewItem =~ /\\.booted\\./",
+          "command": "xbridge.screenshotSimulator",
+          "when": "view == xbridge.simulators && viewItem =~ /\\.booted\\./",
           "group": "inline@2"
         },
         {
-          "command": "xcodekit.setDestination",
-          "when": "view == xcodekit.simulators && viewItem =~ /\\.unselected\\./",
+          "command": "xbridge.setDestination",
+          "when": "view == xbridge.simulators && viewItem =~ /\\.unselected\\./",
           "group": "1_destination@1"
         },
         {
-          "command": "xcodekit.bootSimulator",
-          "when": "view == xcodekit.simulators && viewItem =~ /\\.shutdown\\./",
+          "command": "xbridge.bootSimulator",
+          "when": "view == xbridge.simulators && viewItem =~ /\\.shutdown\\./",
           "group": "1_destination@2"
         },
         {
-          "command": "xcodekit.shutdownSimulator",
-          "when": "view == xcodekit.simulators && viewItem =~ /\\.booted\\./",
+          "command": "xbridge.shutdownSimulator",
+          "when": "view == xbridge.simulators && viewItem =~ /\\.booted\\./",
           "group": "1_destination@2"
         },
         {
-          "command": "xcodekit.openUrlOnSimulator",
-          "when": "view == xcodekit.simulators && viewItem =~ /^simulator\\./",
+          "command": "xbridge.openUrlOnSimulator",
+          "when": "view == xbridge.simulators && viewItem =~ /^simulator\\./",
           "group": "2_device@1"
         },
         {
-          "command": "xcodekit.screenshotSimulator",
-          "when": "view == xcodekit.simulators && viewItem =~ /\\.booted\\./",
+          "command": "xbridge.screenshotSimulator",
+          "when": "view == xbridge.simulators && viewItem =~ /\\.booted\\./",
           "group": "2_device@2"
         },
         {
-          "command": "xcodekit.toggleRecording",
-          "when": "view == xcodekit.simulators && viewItem =~ /\\.booted\\./",
+          "command": "xbridge.toggleRecording",
+          "when": "view == xbridge.simulators && viewItem =~ /\\.booted\\./",
           "group": "2_device@3"
         },
         {
-          "command": "xcodekit.toggleAppearance",
-          "when": "view == xcodekit.simulators && viewItem =~ /\\.booted\\./",
+          "command": "xbridge.toggleAppearance",
+          "when": "view == xbridge.simulators && viewItem =~ /\\.booted\\./",
           "group": "2_device@4"
         },
         {
-          "command": "xcodekit.openAppContainer",
-          "when": "view == xcodekit.simulators && viewItem =~ /\\.booted\\./",
+          "command": "xbridge.openAppContainer",
+          "when": "view == xbridge.simulators && viewItem =~ /\\.booted\\./",
           "group": "3_app@1"
         },
         {
-          "command": "xcodekit.uninstallApp",
-          "when": "view == xcodekit.simulators && viewItem =~ /\\.booted\\./",
+          "command": "xbridge.uninstallApp",
+          "when": "view == xbridge.simulators && viewItem =~ /\\.booted\\./",
           "group": "3_app@2"
         },
         {
-          "command": "xcodekit.copySimulatorUdid",
-          "when": "view == xcodekit.simulators && viewItem =~ /^simulator\\./",
+          "command": "xbridge.copySimulatorUdid",
+          "when": "view == xbridge.simulators && viewItem =~ /^simulator\\./",
           "group": "8_copy@1"
         },
         {
-          "command": "xcodekit.eraseSimulator",
-          "when": "view == xcodekit.simulators && viewItem =~ /^simulator\\./",
+          "command": "xbridge.eraseSimulator",
+          "when": "view == xbridge.simulators && viewItem =~ /^simulator\\./",
           "group": "9_danger@1"
         }
       ]
     },
     "languageModelTools": [
       {
-        "name": "xcodekit_build",
+        "name": "xbridge_build",
         "displayName": "Build iOS Project",
         "modelDescription": "Builds the current Xcode project or workspace using xcodebuild for a given scheme and destination. Returns the build status and any compiler errors/warnings. Use this to verify that Swift/Objective-C code compiles.",
         "userDescription": "Build the iOS project with xcodebuild",
@@ -584,7 +584,7 @@
         }
       },
       {
-        "name": "xcodekit_test",
+        "name": "xbridge_test",
         "displayName": "Run iOS Tests",
         "modelDescription": "Runs the unit/UI tests of the current Xcode project using 'xcodebuild test'. Returns pass/fail summary and failing test details. Optionally filter to a specific test target, class, or method via testIdentifier (e.g. 'MyAppTests/LoginTests/testValidLogin').",
         "userDescription": "Run iOS tests with xcodebuild",
@@ -615,7 +615,7 @@
         }
       },
       {
-        "name": "xcodekit_run",
+        "name": "xbridge_run",
         "displayName": "Run iOS App on Simulator",
         "modelDescription": "Builds the app, installs it on the selected iOS simulator (booting it if needed), and launches it. Returns the launch status and the app bundle identifier.",
         "userDescription": "Build, install and launch the app on a simulator",
@@ -643,7 +643,7 @@
         }
       },
       {
-        "name": "xcodekit_listSchemes",
+        "name": "xbridge_listSchemes",
         "displayName": "List Xcode Schemes",
         "modelDescription": "Lists all schemes, targets and configurations available in the current Xcode project or workspace. Use this to discover valid scheme names before building, running or testing.",
         "userDescription": "List available Xcode schemes and targets",
@@ -660,7 +660,7 @@
         }
       },
       {
-        "name": "xcodekit_listSimulators",
+        "name": "xbridge_listSimulators",
         "displayName": "List iOS Simulators",
         "modelDescription": "Lists available iOS simulators grouped by runtime, including their name, UDID and boot state. Use this to discover valid destination UDIDs.",
         "userDescription": "List available iOS simulators",
@@ -682,7 +682,7 @@
         }
       },
       {
-        "name": "xcodekit_bootSimulator",
+        "name": "xbridge_bootSimulator",
         "displayName": "Boot iOS Simulator",
         "modelDescription": "Boots an iOS simulator by UDID (or the selected destination) so that apps can be installed and launched on it.",
         "userDescription": "Boot an iOS simulator",
@@ -706,47 +706,47 @@
     ],
     "walkthroughs": [
       {
-        "id": "xcodekit.welcome",
-        "title": "Get started with XcodeKit",
+        "id": "xbridge.welcome",
+        "title": "Get started with XBridge",
         "description": "Build, run and test your iOS app on a simulator without leaving VS Code.",
         "when": "isMac",
         "steps": [
           {
-            "id": "xcodekit.walkthrough.project",
+            "id": "xbridge.walkthrough.project",
             "title": "Pick your project",
-            "description": "XcodeKit auto-detects an .xcodeproj, .xcworkspace or Package.swift in your folder. If you have several, choose one.\n[Select Xcode Project](command:xcodekit.selectProject)",
+            "description": "XBridge auto-detects an .xcodeproj, .xcworkspace or Package.swift in your folder. If you have several, choose one.\n[Select Xcode Project](command:xbridge.selectProject)",
             "media": {
               "markdown": "media/walkthrough/project.md"
             },
             "completionEvents": [
-              "onCommand:xcodekit.selectProject"
+              "onCommand:xbridge.selectProject"
             ]
           },
           {
-            "id": "xcodekit.walkthrough.destination",
+            "id": "xbridge.walkthrough.destination",
             "title": "Choose a simulator",
-            "description": "Open the XcodeKit view in the Activity Bar and click any simulator to make it your run destination — booted devices are listed first.\n[Select Destination](command:xcodekit.selectDestination)",
+            "description": "Open the XBridge view in the Activity Bar and click any simulator to make it your run destination — booted devices are listed first.\n[Select Destination](command:xbridge.selectDestination)",
             "media": {
               "markdown": "media/walkthrough/destination.md"
             },
             "completionEvents": [
-              "onCommand:xcodekit.selectDestination",
-              "onCommand:xcodekit.setDestination"
+              "onCommand:xbridge.selectDestination",
+              "onCommand:xbridge.setDestination"
             ]
           },
           {
-            "id": "xcodekit.walkthrough.run",
+            "id": "xbridge.walkthrough.run",
             "title": "Build and run",
-            "description": "Hit Run to build, install and launch on the simulator. The app's console streams into the XcodeKit App output channel.\n[Build & Run](command:xcodekit.run)",
+            "description": "Hit Run to build, install and launch on the simulator. The app's console streams into the XBridge App output channel.\n[Build & Run](command:xbridge.run)",
             "media": {
               "markdown": "media/walkthrough/run.md"
             },
             "completionEvents": [
-              "onCommand:xcodekit.run"
+              "onCommand:xbridge.run"
             ]
           },
           {
-            "id": "xcodekit.walkthrough.ai",
+            "id": "xbridge.walkthrough.ai",
             "title": "Let Copilot drive Xcode",
             "description": "Reference #iosBuild, #iosTest or #iosRun in Copilot Chat and the agent can compile your Swift code, run tests and read back the failures.\n[Open Chat](command:workbench.action.chat.open)",
             "media": {

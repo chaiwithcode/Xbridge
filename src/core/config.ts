@@ -14,7 +14,7 @@ export interface XcodeProject {
   containerFlag?: "-workspace" | "-project";
 }
 
-const CONFIG_SECTION = "xcodekit";
+const CONFIG_SECTION = "xbridge";
 
 export class ConfigService {
   private get config(): vscode.WorkspaceConfiguration {
@@ -67,7 +67,7 @@ export class ConfigService {
     return this.config.get<string[]>("extraBuildArgs") ?? [];
   }
 
-  /** Stream the launched app's stdout/stderr into the "XcodeKit App" channel. */
+  /** Stream the launched app's stdout/stderr into the "XBridge App" channel. */
   get streamAppLogs(): boolean {
     return this.config.get<boolean>("streamAppLogs") ?? true;
   }
@@ -106,7 +106,7 @@ export class ConfigService {
     const detected = await this.autoDetect();
     if (!detected) {
       throw new Error(
-        "No Xcode project, workspace or Package.swift found in the workspace. Set 'xcodekit.projectPath' to specify one."
+        "No Xcode project, workspace or Package.swift found in the workspace. Set 'xbridge.projectPath' to specify one."
       );
     }
     return detected;
