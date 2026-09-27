@@ -1,14 +1,21 @@
 {
   "name": "xbridge",
   "displayName": "XBridge",
-  "description": "Build, run, test and manage iOS/macOS Xcode projects and simulators directly from VS Code — with first-class AI agent tools.",
-  "version": "1.3.0",
-  "publisher": "mithlesh",
+  "description": "Build, test, and run Xcode projects from VS Code—with simulator, device, Test Explorer, and AI agent tools.",
+  "version": "1.4.0",
+  "publisher": "chaiwithcode",
   "author": {
     "name": "Deepak Sharma"
   },
   "license": "MIT",
-  "homepage": "https://marketplace.visualstudio.com/items?itemName=mithlesh.xbridge",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chaiwithcode/xbridge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/chaiwithcode/xbridge/issues"
+  },
+  "homepage": "https://github.com/chaiwithcode/xbridge#readme",
   "icon": "media/icon.png",
   "galleryBanner": {
     "color": "#0A84FF",
@@ -303,6 +310,24 @@
         "icon": "$(trash)"
       },
       {
+        "command": "xbridge.resolvePackages",
+        "title": "Resolve Package Dependencies",
+        "category": "XBridge",
+        "icon": "$(package)"
+      },
+      {
+        "command": "xbridge.openInXcode",
+        "title": "Open in Xcode",
+        "category": "XBridge",
+        "icon": "$(link-external)"
+      },
+      {
+        "command": "xbridge.refreshDevices",
+        "title": "Refresh Devices & Simulators",
+        "category": "XBridge",
+        "icon": "$(refresh)"
+      },
+      {
         "command": "xbridge.openWalkthrough",
         "title": "Getting Started",
         "category": "XBridge",
@@ -345,6 +370,12 @@
         "key": "ctrl+cmd+d",
         "mac": "ctrl+cmd+d",
         "when": "xbridge.hasProject"
+      },
+      {
+        "command": "xbridge.resolvePackages",
+        "key": "ctrl+cmd+p",
+        "mac": "ctrl+cmd+p",
+        "when": "xbridge.hasProject && !xbridge.running"
       }
     ],
     "viewsContainers": {
@@ -366,7 +397,7 @@
         },
         {
           "id": "xbridge.simulators",
-          "name": "Simulators",
+          "name": "Destinations",
           "icon": "$(device-mobile)",
           "contextualTitle": "XBridge"
         }
@@ -463,9 +494,19 @@
           "group": "2_config@5"
         },
         {
+          "command": "xbridge.resolvePackages",
+          "when": "view == xbridge.schemes && !xbridge.running",
+          "group": "1_build@5"
+        },
+        {
           "command": "xbridge.selectProject",
           "when": "view == xbridge.schemes",
           "group": "3_project@1"
+        },
+        {
+          "command": "xbridge.openInXcode",
+          "when": "view == xbridge.schemes",
+          "group": "3_project@2"
         },
         {
           "command": "xbridge.refreshSimulators",
@@ -701,6 +742,42 @@
               "description": "UDID of the simulator to boot. Optional; defaults to the selected destination."
             }
           }
+        }
+      },
+      {
+        "name": "xbridge_readDiagnostics",
+        "displayName": "Read Build Diagnostics",
+        "modelDescription": "Returns the errors, warnings and test failures from the most recent build or test run without re-building. Use this to check the current state of the project after code changes, before deciding whether to rebuild.",
+        "userDescription": "Read errors and warnings from the last build",
+        "toolReferenceName": "iosDiagnostics",
+        "canBeReferencedInPrompt": true,
+        "icon": "$(list-flat)",
+        "tags": [
+          "ios",
+          "xcode",
+          "diagnostics"
+        ],
+        "inputSchema": {
+          "type": "object",
+          "properties": {}
+        }
+      },
+      {
+        "name": "xbridge_clean",
+        "displayName": "Clean Build Folder",
+        "modelDescription": "Cleans the Xcode build folder (DerivedData) so the next build starts completely fresh. Use this when builds produce stale or inconsistent results, or after significant project structure changes.",
+        "userDescription": "Clean the Xcode build folder",
+        "toolReferenceName": "iosClean",
+        "canBeReferencedInPrompt": true,
+        "icon": "$(trash)",
+        "tags": [
+          "ios",
+          "xcode",
+          "clean"
+        ],
+        "inputSchema": {
+          "type": "object",
+          "properties": {}
         }
       }
     ],

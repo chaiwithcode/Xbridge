@@ -250,7 +250,9 @@ export function registerTestExplorer(
           const failure = failures.find(
             (f) =>
               (f.testCase && f.testCase.includes(item.label)) ||
-              f.message.includes(item.label)
+              f.message.includes(item.label) ||
+              // Swift Testing uses function-style names: "validateLogin" matches "validateLogin()"
+              (f.testCase && f.testCase.replace(/\(\)$/, "") === item.label)
           );
           if (result.succeeded && !failure) {
             run.passed(item);

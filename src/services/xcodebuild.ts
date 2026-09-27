@@ -108,22 +108,34 @@ export class XcodebuildService {
     }
   }
 
-  /** Resolves the active scheme, auto-selecting the only one if unset. */
+  /** Resolves the active scheme, validating existence and auto-selecting if needed. */
   async resolveScheme(explicit?: string): Promise<string> {
     if (explicit) {
       return explicit;
     }
+    const { schemes } = await this.listSchemes();
+    if (schemes.length === 0) {
+      throw new Error("No schemes found in the project.");
+    }
     const configured = this.config.scheme;
-    if (configured) {
+    if (configured && schemes.includes(configured)) {
       return configured;
     }
-    const { schemes } = await this.listSchemes();
     if (schemes.length === 1) {
       await this.config.setScheme(schemes[0]);
       return schemes[0];
     }
-    if (schemes.length === 0) {
-      throw new Error("No schemes found in the project.");
+    const pick = await vscode.window.showQuickPick(
+      schemes.map((s) => ({ label: `$(target) ${s}`, value: s })),
+      {
+        placeHolder: configured
+          ? `Scheme "${configured}" is not in this project. Select an available scheme:`
+          : "Select a scheme to build, run and test",
+      }
+    );
+    if (pick?.value) {
+      await this.config.setScheme(pick.value);
+      return pick.value;
     }
     throw new Error(
       `Multiple schemes available (${schemes.join(", ")}). Select one with "XBridge: Select Scheme".`
@@ -196,6 +208,7 @@ export class XcodebuildService {
       ...this.containerArgs(project),
       ...this.destinationArgs(options.destinationId),
       ...this.derivedDataArgs(),
+      "ENABLE_TESTABILITY=YES",
       ...this.config.extraBuildArgs,
     ];
     return { project, args };
@@ -251,5 +264,20 @@ export class XcodebuildService {
       testArgs.push("-only-testing", id);
     }
     return this.startAction("test", project, testArgs, options.onLog, options.token).promise;
+  }
+
+  /** Runs `xcodebuild -resolvePackageDependencies` for the active project. */
+  async resolvePackages(
+    onLog?: (chunk: string) => void,
+    token?: vscode.CancellationToken
+  ): Promise<RunResult> {
+    const project = await this.config.resolveProject();
+    const scheme = await this.resolveScheme().catch(() => undefined);
+    const args = [
+      ...this.containerArgs(project),
+      ...this.derivedDataArgs(),
+      ...(scheme ? ["-scheme", scheme] : []),
+    ];
+    return this.startAction("-resolvePackageDependencies", project, args, onLog, token).promise;
   }
 }

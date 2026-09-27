@@ -1,6 +1,7 @@
 //  Created by Deepak Sharma on 03/07/2026.
 import * as vscode from "vscode";
 import { DeviceKind, SimctlService, Simulator } from "../services/simctl";
+import { DevicectlService, PhysicalDevice } from "../services/devicectl";
 
 const KIND_ICONS: Record<DeviceKind, string> = {
   iphone: "device-mobile",
@@ -11,6 +12,59 @@ const KIND_ICONS: Record<DeviceKind, string> = {
   mac: "device-desktop",
   other: "device-mobile",
 };
+
+/** A physical device. Clicking it makes it the active run destination. */
+export class DeviceItem extends vscode.TreeItem {
+  constructor(public readonly device: PhysicalDevice, selected: boolean) {
+    super(device.name, vscode.TreeItemCollapsibleState.None);
+
+    const tags = [device.marketingName];
+    if (device.osVersion) {
+      tags.push(`iOS ${device.osVersion}`);
+    }
+    if (device.tunnelConnected) {
+      tags.push("Connected");
+    } else {
+      tags.push(device.tunnelState === "disconnected" ? "Disconnected" : "Unavailable");
+    }
+    if (selected) {
+      tags.push("Destination");
+    }
+    this.description = tags.join(" • ");
+
+    const icon = selected ? "pass-filled" : "plug";
+    const color = selected || device.tunnelConnected ? "charts.green" : "foreground";
+    this.iconPath = new vscode.ThemeIcon(icon, new vscode.ThemeColor(color));
+
+    this.contextValue = [
+      "physicalDevice",
+      device.tunnelConnected ? "connected" : "disconnected",
+      selected ? "selected" : "unselected",
+    ].join(".");
+
+    this.tooltip = new vscode.MarkdownString(
+      [
+        `**${device.name}**`,
+        "",
+        `Model · ${device.marketingName}`,
+        `OS · ${device.platform} ${device.osVersion}`,
+        `Connection · ${device.transportType} (${device.tunnelState})`,
+        `Developer Mode · ${device.developerModeEnabled ? "Enabled" : "Disabled"}`,
+        `UDID · \`${device.udid}\``,
+        "",
+        selected
+          ? "_This is the active run destination._"
+          : "_Click to make this the active run destination._",
+      ].join("\n")
+    );
+
+    this.command = {
+      command: "xbridge.setDestination",
+      title: "Set as Destination",
+      arguments: [device.udid],
+    };
+  }
+}
 
 /** A single simulator. Clicking it makes it the active run destination. */
 export class SimulatorItem extends vscode.TreeItem {
@@ -90,27 +144,30 @@ class GroupItem extends vscode.TreeItem {
   }
 }
 
-type Node = GroupItem | SimulatorItem | vscode.TreeItem;
+type Node = GroupItem | SimulatorItem | DeviceItem | vscode.TreeItem;
 
 export class SimulatorTreeProvider implements vscode.TreeDataProvider<Node> {
   private readonly _onDidChangeTreeData = new vscode.EventEmitter<void>();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
   private simulators: Simulator[] = [];
+  private devices: PhysicalDevice[] = [];
   /** UDIDs with an in-flight screen recording. */
   private readonly recording = new Set<string>();
 
   constructor(
     private readonly simctl: SimctlService,
-    private readonly getSelectedUdid: () => string | undefined
+    private readonly getSelectedUdid: () => string | undefined,
+    private readonly devicectl?: DevicectlService
   ) {}
 
   refresh(): void {
     this.simctl.invalidate();
+    this.devicectl?.invalidate();
     this._onDidChangeTreeData.fire();
   }
 
-  /** Re-renders without re-querying simctl (e.g. the destination changed). */
+  /** Re-renders without re-querying simctl/devicectl (e.g. the destination changed). */
   rerender(): void {
     this._onDidChangeTreeData.fire();
   }
@@ -134,25 +191,37 @@ export class SimulatorTreeProvider implements vscode.TreeDataProvider<Node> {
 
   async getChildren(element?: Node): Promise<Node[]> {
     if (!element) {
-      try {
-        this.simulators = await this.simctl.list(true);
-      } catch {
-        this.simulators = [];
-      }
-      if (this.simulators.length === 0) {
-        const empty = new vscode.TreeItem("No simulators available");
+      const [devices, sims] = await Promise.all([
+        this.devicectl?.listDevices().catch(() => []) ?? [],
+        this.simctl.list(true).catch(() => []),
+      ]);
+      this.devices = devices;
+      this.simulators = sims;
+
+      if (this.simulators.length === 0 && this.devices.length === 0) {
+        const empty = new vscode.TreeItem("No destinations available");
         empty.iconPath = new vscode.ThemeIcon("warning");
-        empty.description = "Install a runtime in Xcode";
+        empty.description = "Connect an iOS device or install a simulator runtime";
         return [empty];
       }
 
       const nodes: Node[] = [];
+      const selected = this.getSelectedUdid();
+
+      if (this.devices.length > 0) {
+        const holdsSelection = this.devices.some(
+          (d) => d.udid === selected || d.coreDeviceIdentifier === selected
+        );
+        nodes.push(
+          new GroupItem("Connected Devices", "devices", this.devices.length, holdsSelection || true, "plug")
+        );
+      }
+
       const booted = this.simulators.filter((s) => s.state === "Booted");
       if (booted.length > 0) {
         nodes.push(new GroupItem("Booted", "booted", booted.length, true, "vm-running"));
       }
 
-      const selected = this.getSelectedUdid();
       const runtimes = [...new Set(this.simulators.map((s) => s.runtime))];
       for (const runtime of runtimes) {
         const group = this.simulators.filter((s) => s.runtime === runtime && s.state !== "Booted");
@@ -168,6 +237,11 @@ export class SimulatorTreeProvider implements vscode.TreeDataProvider<Node> {
 
     if (element instanceof GroupItem) {
       const selected = this.getSelectedUdid();
+      if (element.key === "devices") {
+        return this.devices.map(
+          (d) => new DeviceItem(d, d.udid === selected || d.coreDeviceIdentifier === selected)
+        );
+      }
       const group =
         element.key === "booted"
           ? this.simulators.filter((s) => s.state === "Booted")

@@ -5,6 +5,7 @@ import * as path from "path";
 import { XBridgeManager } from "./manager";
 import { ConfigService } from "./core/config";
 import { SimctlService, Simulator } from "./services/simctl";
+import { DevicectlService } from "./services/devicectl";
 import { XcodebuildService } from "./services/xcodebuild";
 import { log } from "./core/log";
 import { Process, run } from "./core/process";
@@ -16,6 +17,7 @@ interface Deps {
   manager: XBridgeManager;
   config: ConfigService;
   simctl: SimctlService;
+  devicectl?: DevicectlService;
   xcodebuild: XcodebuildService;
   schemeTree: SchemeTreeProvider;
   simulatorTree: SimulatorTreeProvider;
@@ -211,6 +213,34 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
         });
         if (result.succeeded) {
           vscode.window.setStatusBarMessage("$(pass-filled) XBridge: Build succeeded", 4000);
+        } else if (result.parsed.codeSigningFailed) {
+          vscode.window
+            .showErrorMessage(
+              "XBridge: Code signing error: A Development Team or Provisioning Profile is required.",
+              "Open in Xcode",
+              "Show Output"
+            )
+            .then((choice) => {
+              if (choice === "Open in Xcode") {
+                void vscode.commands.executeCommand("xbridge.openInXcode");
+              } else if (choice === "Show Output") {
+                log.build.show();
+              }
+            });
+        } else if (result.parsed.schemeNotFound) {
+          vscode.window
+            .showErrorMessage(
+              "XBridge: Scheme not found in active project.",
+              "Select Scheme",
+              "Select Project"
+            )
+            .then((choice) => {
+              if (choice === "Select Scheme") {
+                void vscode.commands.executeCommand("xbridge.selectScheme");
+              } else if (choice === "Select Project") {
+                void vscode.commands.executeCommand("xbridge.selectProject");
+              }
+            });
         } else {
           vscode.window
             .showErrorMessage(
@@ -268,9 +298,35 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
           warnings: result.parsed.warnings.length,
         });
         if (!result.succeeded) {
-          vscode.window
-            .showErrorMessage(`XBridge: ${result.summary.split("\n")[0]}`, "Show Issues")
-            .then((c) => c && vscode.commands.executeCommand("xbridge.showIssues"));
+          if (result.parsed.codeSigningFailed) {
+            vscode.window
+              .showErrorMessage(
+                "XBridge: Code signing error: A Development Team or Provisioning Profile is required for device deployment.",
+                "Open in Xcode",
+                "Show Output"
+              )
+              .then((choice) => {
+                if (choice === "Open in Xcode") {
+                  void vscode.commands.executeCommand("xbridge.openInXcode");
+                } else if (choice === "Show Output") {
+                  log.build.show();
+                }
+              });
+          } else {
+            const detail =
+              result.parsed.errors.length > 0
+                ? `Build failed with ${result.parsed.errors.length} error(s).`
+                : "Run failed.";
+            vscode.window
+              .showErrorMessage(`XBridge: ${detail}`, "Show Issues", "Show Output")
+              .then((c) => {
+                if (c === "Show Issues") {
+                  void vscode.commands.executeCommand("xbridge.showIssues");
+                } else if (c === "Show Output") {
+                  log.build.show();
+                }
+              });
+          }
         }
         await reload();
       },
@@ -315,10 +371,51 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
             `$(pass-filled) XBridge: ${result.parsed.testSummary ?? "Tests passed"}`,
             5000
           );
-        } else {
+        } else if (result.parsed.missingDebugDylib) {
           vscode.window
-            .showErrorMessage(`XBridge: ${result.summary.split("\n")[0]}`, "Show Issues")
-            .then((c) => c && vscode.commands.executeCommand("xbridge.showIssues"));
+            .showErrorMessage(
+              "XBridge: Testability debug dylib is missing from DerivedData. Clean build folder and re-run.",
+              "Clean & Re-test",
+              "Show Output"
+            )
+            .then(async (choice) => {
+              if (choice === "Clean & Re-test") {
+                await vscode.commands.executeCommand("xbridge.clean");
+                void vscode.commands.executeCommand("xbridge.test");
+              } else if (choice === "Show Output") {
+                log.build.show();
+              }
+            });
+        } else if (result.parsed.buildFailedBeforeTests) {
+          vscode.window
+            .showErrorMessage(
+              `XBridge: Test compilation failed with ${result.parsed.errors.length} error(s).`,
+              "Show Issues",
+              "Show Output"
+            )
+            .then((choice) => {
+              if (choice === "Show Issues") {
+                void vscode.commands.executeCommand("xbridge.showIssues");
+              } else if (choice === "Show Output") {
+                log.build.show();
+              }
+            });
+        } else {
+          const detail =
+            result.parsed.errors.length > 0
+              ? `Test build failed with ${result.parsed.errors.length} compile error(s).`
+              : result.parsed.testFailures.length > 0
+              ? `Tests failed with ${result.parsed.testFailures.length} failure(s).`
+              : "Testing failed.";
+          vscode.window
+            .showErrorMessage(`XBridge: ${detail}`, "Show Issues", "Show Output")
+            .then((choice) => {
+              if (choice === "Show Issues") {
+                void vscode.commands.executeCommand("xbridge.showIssues");
+              } else if (choice === "Show Output") {
+                log.build.show();
+              }
+            });
         }
       },
       () => statusBar.clearActivity()
@@ -460,13 +557,31 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
   register("xbridge.selectDestination", async () => {
     const active = config.destination;
     const pick = await pickAsync(
-      "Select a destination (simulator)",
+      "Select a destination (simulator or physical device)",
       async () => {
-        const sims = await simctl.list(true).catch(() => []);
+        const [devices, sims] = await Promise.all([
+          deps.devicectl?.listDevices().catch(() => []) ?? [],
+          simctl.list(true).catch(() => []),
+        ]);
         const items: PickItem[] = [];
+
+        if (devices.length > 0) {
+          items.push({ label: "Connected Devices", kind: vscode.QuickPickItemKind.Separator });
+          for (const d of devices) {
+            items.push({
+              label: `$(plug) ${d.name}`,
+              description: `${d.marketingName}  •  ${d.platform} ${d.osVersion}${
+                d.udid === active || d.coreDeviceIdentifier === active ? "  •  active" : ""
+              }`,
+              detail: `${d.udid} (${d.tunnelState})`,
+              udid: d.udid,
+            });
+          }
+        }
+
         const booted = sims.filter((s) => s.state === "Booted");
         if (booted.length > 0) {
-          items.push({ label: "Booted", kind: vscode.QuickPickItemKind.Separator });
+          items.push({ label: "Booted Simulators", kind: vscode.QuickPickItemKind.Separator });
           for (const s of booted) {
             items.push({
               label: `$(vm-running) ${s.name}`,
@@ -502,9 +617,16 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
     }
   });
 
-  /** Invoked by clicking a simulator row, so it becomes the run destination. */
-  register("xbridge.setDestination", async (arg?: string | SimulatorContext) => {
-    const udid = typeof arg === "string" ? arg : arg?.simulator?.udid;
+  /** Invoked by clicking a simulator or device row, so it becomes the run destination. */
+  register("xbridge.setDestination", async (arg?: string | SimulatorContext | { device?: { udid: string } }) => {
+    let udid: string | undefined;
+    if (typeof arg === "string") {
+      udid = arg;
+    } else if (arg && "device" in arg && arg.device) {
+      udid = arg.device.udid;
+    } else if (arg && "simulator" in arg && arg.simulator) {
+      udid = arg.simulator.udid;
+    }
     if (!udid) {
       return;
     }
@@ -700,8 +822,57 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
 
   // ---------------------------------------------------------------- misc
 
+  register("xbridge.resolvePackages", () =>
+    withActionProgress(
+      "XBridge: Resolving package dependencies…",
+      async (token) => {
+        statusBar.startActivity("Build");
+        const result = await xcodebuild.resolvePackages(
+          (c) => {
+            log.build.append(c);
+            statusBar.observeLog(c);
+          },
+          token
+        );
+        const succeeded = result.code === 0;
+        statusBar.showResult({
+          action: "Build",
+          succeeded,
+          errors: 0,
+          warnings: 0,
+        });
+        if (succeeded) {
+          vscode.window.setStatusBarMessage(
+            "$(pass-filled) XBridge: Package dependencies resolved",
+            4000
+          );
+        } else {
+          vscode.window
+            .showErrorMessage(
+              "XBridge: Failed to resolve package dependencies.",
+              "Show Output"
+            )
+            .then((c) => c && log.build.show());
+        }
+      },
+      () => statusBar.clearActivity()
+    ).catch(fail)
+  );
+
+  register("xbridge.openInXcode", async () => {
+    try {
+      const project = await config.resolveProject();
+      await run("open", ["-a", "Xcode", project.path]);
+    } catch {
+      vscode.window.showErrorMessage(
+        "XBridge: No Xcode project found to open."
+      );
+    }
+  });
+
   register("xbridge.openSimulatorApp", () => simctl.openApp());
   register("xbridge.refreshSimulators", () => simulatorTree.refresh());
+  register("xbridge.refreshDevices", () => simulatorTree.refresh());
   register("xbridge.refreshSchemes", () => void reload());
   register("xbridge.showOutput", () => log.build.show());
   register("xbridge.showAppLog", () => log.app.show());
@@ -750,22 +921,136 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Deps): 
     }
   });
 
-  // Pick an Xcode project/workspace when none is auto-detected.
+  // Pick an Xcode project/workspace when none is auto-detected, or switch between discovered projects.
   register("xbridge.selectProject", async () => {
-    const picks = await vscode.window.showOpenDialog({
-      canSelectFiles: true,
-      canSelectFolders: true,
-      canSelectMany: false,
-      openLabel: "Select Xcode Project",
-      filters: { "Xcode Project": ["xcodeproj", "xcworkspace"] },
+    const exclude = "**/{node_modules,.build,DerivedData}/**";
+    const [workspaces, projects, packages] = await Promise.all([
+      vscode.workspace.findFiles("**/*.xcworkspace/contents.xcworkspacedata", exclude, 20),
+      vscode.workspace.findFiles("**/*.xcodeproj/project.pbxproj", exclude, 20),
+      vscode.workspace.findFiles("**/Package.swift", exclude, 20),
+    ]);
+
+    const activeProject = await config.resolveProject().catch(() => undefined);
+    const activePath = config.projectPath ?? activeProject?.path;
+
+    interface ProjectPickItem extends vscode.QuickPickItem {
+      projectPath?: string;
+      action?: "browse" | "clear";
+    }
+
+    const items: ProjectPickItem[] = [];
+
+    const wsPaths = workspaces
+      .map((ws) => path.dirname(ws.fsPath))
+      .filter((p) => !p.includes(".xcodeproj/"))
+      .sort((a, b) => a.split(path.sep).length - b.split(path.sep).length);
+
+    const projPaths = projects
+      .map((p) => path.dirname(p.fsPath))
+      .sort((a, b) => a.split(path.sep).length - b.split(path.sep).length);
+
+    const pkgPaths = packages
+      .map((p) => p.fsPath)
+      .sort((a, b) => a.split(path.sep).length - b.split(path.sep).length);
+
+    const wsFolders = vscode.workspace.workspaceFolders;
+    const wsRoot = wsFolders?.[0]?.uri.fsPath;
+
+    const formatRel = (p: string) => {
+      if (wsRoot) {
+        const rel = path.relative(wsRoot, p);
+        return rel.startsWith("..") ? p : rel;
+      }
+      return p;
+    };
+
+    if (wsPaths.length > 0 || projPaths.length > 0 || pkgPaths.length > 0) {
+      items.push({ label: "Discovered Projects & Workspaces", kind: vscode.QuickPickItemKind.Separator });
+      for (const p of wsPaths) {
+        const isCurrent = p === activePath;
+        items.push({
+          label: `$(folder-opened) ${path.basename(p)}`,
+          description: formatRel(p) + (isCurrent ? "  •  active" : ""),
+          detail: p,
+          projectPath: p,
+        });
+      }
+      for (const p of projPaths) {
+        const isCurrent = p === activePath;
+        items.push({
+          label: `$(folder-opened) ${path.basename(p)}`,
+          description: formatRel(p) + (isCurrent ? "  •  active" : ""),
+          detail: p,
+          projectPath: p,
+        });
+      }
+      for (const p of pkgPaths) {
+        const isCurrent = p === activePath;
+        items.push({
+          label: `$(package) ${path.basename(p)} (Swift Package)`,
+          description: formatRel(p) + (isCurrent ? "  •  active" : ""),
+          detail: p,
+          projectPath: p,
+        });
+      }
+    }
+
+    items.push({ label: "Options", kind: vscode.QuickPickItemKind.Separator });
+    items.push({
+      label: "$(file-directory) Browse with File Dialog…",
+      description: "Locate an Xcode project anywhere on disk",
+      action: "browse",
     });
-    const chosen = picks?.[0];
-    if (chosen) {
-      await vscode.workspace
-        .getConfiguration("xbridge")
-        .update("projectPath", chosen.fsPath, vscode.ConfigurationTarget.Workspace);
+
+    if (config.projectPath) {
+      items.push({
+        label: "$(clear-all) Reset to Auto-detect",
+        description: `Currently overridden to: ${config.projectPath}`,
+        action: "clear",
+      });
+    }
+
+    const pick = await vscode.window.showQuickPick(items, {
+      placeHolder: "Select the Xcode project or workspace to use",
+      matchOnDescription: true,
+      matchOnDetail: true,
+    });
+
+    if (!pick) {
+      return;
+    }
+
+    if (pick.action === "browse") {
+      const dialogPicks = await vscode.window.showOpenDialog({
+        canSelectFiles: true,
+        canSelectFolders: true,
+        canSelectMany: false,
+        openLabel: "Select Xcode Project",
+        filters: { "Xcode Project": ["xcodeproj", "xcworkspace"] },
+      });
+      const chosen = dialogPicks?.[0];
+      if (chosen) {
+        await config.setProjectPath(chosen.fsPath);
+        config.invalidate();
+        xcodebuild.invalidate();
+        await updateHasProjectContext(config);
+        await reload();
+        vscode.window.showInformationMessage(`XBridge: Active project set to ${path.basename(chosen.fsPath)}`);
+      }
+    } else if (pick.action === "clear") {
+      await config.setProjectPath(undefined);
+      config.invalidate();
+      xcodebuild.invalidate();
       await updateHasProjectContext(config);
       await reload();
+      vscode.window.showInformationMessage("XBridge: Reset project to auto-detect.");
+    } else if (pick.projectPath) {
+      await config.setProjectPath(pick.projectPath);
+      config.invalidate();
+      xcodebuild.invalidate();
+      await updateHasProjectContext(config);
+      await reload();
+      vscode.window.showInformationMessage(`XBridge: Active project set to ${path.basename(pick.projectPath)}`);
     }
   });
 

@@ -5,6 +5,7 @@ import { log } from "./core/log";
 import { Process } from "./core/process";
 import { XcodebuildService } from "./services/xcodebuild";
 import { SimctlService, Simulator } from "./services/simctl";
+import { DevicectlService } from "./services/devicectl";
 import { parseXcodebuildOutput, ParsedOutput } from "./services/outputParser";
 
 export interface ActionResult {
@@ -48,7 +49,8 @@ export class XBridgeManager {
   constructor(
     readonly config: ConfigService,
     readonly xcodebuild: XcodebuildService,
-    readonly simctl: SimctlService
+    readonly simctl: SimctlService,
+    readonly devicectl?: DevicectlService
   ) {
     this.diagnostics = vscode.languages.createDiagnosticCollection("xbridge");
   }
@@ -72,7 +74,9 @@ export class XBridgeManager {
     this.appProcess?.cancel();
     this.appProcess = undefined;
     this.appSession = undefined;
-    await this.simctl.terminate(session.udid, session.bundleId);
+    if (!(await this.isPhysicalDevice(session.udid))) {
+      await this.simctl.terminate(session.udid, session.bundleId);
+    }
     log.app.appendLine(`\n--- ${session.name} terminated ---`);
     this._onDidChangeState.fire();
   }
@@ -252,17 +256,35 @@ export class XBridgeManager {
     });
   }
 
-  /** Ensures a bootable simulator destination is selected, returns its UDID. */
+  /** Determines if the given UDID or identifier belongs to a physical device. */
+  async isPhysicalDevice(udid: string): Promise<boolean> {
+    if (!this.devicectl) {
+      return false;
+    }
+    const dev = await this.devicectl.find(udid);
+    return Boolean(dev);
+  }
+
+  /** Ensures a bootable destination is selected (simulator or device), returns its UDID. */
   async ensureDestination(destinationId?: string): Promise<string> {
     const udid = destinationId ?? this.config.destination;
     if (udid) {
       return udid;
     }
+    // Check connected physical devices first
+    if (this.devicectl) {
+      const devices = await this.devicectl.listDevices();
+      const connected = devices.find((d) => d.tunnelConnected);
+      if (connected) {
+        await this.config.setDestination(connected.udid);
+        return connected.udid;
+      }
+    }
     const sims = await this.simctl.list(true);
     const booted = sims.find((s) => s.state === "Booted");
     const chosen = booted ?? sims[0];
     if (!chosen) {
-      throw new Error("No iOS simulators are available.");
+      throw new Error("No iOS simulators or physical devices are available.");
     }
     await this.config.setDestination(chosen.udid);
     return chosen.udid;
@@ -288,6 +310,41 @@ export class XBridgeManager {
       throw new Error("Could not resolve app path or bundle identifier from build settings.");
     }
 
+    const bundleId = settings.productBundleIdentifier;
+    const name = settings.productName ?? scheme;
+    const isDevice = await this.isPhysicalDevice(destinationId);
+
+    if (isDevice && this.devicectl) {
+      const dev = await this.devicectl.find(destinationId);
+      const targetId = dev?.coreDeviceIdentifier ?? destinationId;
+
+      if (dev && !dev.developerModeEnabled) {
+        throw new Error(
+          `Developer Mode is disabled on "${dev.name}". Enable it in Settings > Privacy & Security > Developer Mode.`
+        );
+      }
+
+      log.build.appendLine(`\nInstalling on device ${dev?.name ?? destinationId}…`);
+      await this.devicectl.installApp(targetId, settings.appPath);
+      log.build.appendLine(`Launching ${bundleId} on device`);
+
+      await this.stopApp();
+      if (this.config.streamAppLogs) {
+        this.launchStreamingDevice(targetId, bundleId, name);
+      } else {
+        await this.devicectl.launchApp(targetId, bundleId);
+      }
+      this.appSession = { udid: destinationId, bundleId, name };
+      this._onDidChangeState.fire();
+
+      return {
+        ...buildResult,
+        bundleId,
+        appPath: settings.appPath,
+        summary: `Launched ${name} (${bundleId}) on device ${dev?.name ?? destinationId}.`,
+      };
+    }
+
     // 3. Boot simulator
     log.build.appendLine(`\nBooting simulator ${destinationId}…`);
     await this.simctl.boot(destinationId);
@@ -296,8 +353,6 @@ export class XBridgeManager {
     }
 
     // 4. Install + launch
-    const bundleId = settings.productBundleIdentifier;
-    const name = settings.productName ?? scheme;
     log.build.appendLine(`Installing ${settings.appPath}`);
     await this.simctl.install(destinationId, settings.appPath);
     log.build.appendLine(`Launching ${bundleId}`);
@@ -326,6 +381,24 @@ export class XBridgeManager {
   private launchStreaming(udid: string, bundleId: string, name: string): void {
     log.app.appendLine(`\n--- ${name} (${bundleId}) launched ---`);
     const proc = this.simctl.launchWithConsole(udid, bundleId, (chunk) => log.app.append(chunk));
+    this.appProcess = proc;
+    void proc.promise
+      .catch((err) => log.error("App console stream ended", err))
+      .finally(() => {
+        if (this.appProcess === proc) {
+          this.appProcess = undefined;
+          this.appSession = undefined;
+          this._onDidChangeState.fire();
+        }
+      });
+  }
+
+  private launchStreamingDevice(deviceId: string, bundleId: string, name: string): void {
+    if (!this.devicectl) {
+      return;
+    }
+    log.app.appendLine(`\n--- ${name} (${bundleId}) launched on physical device ---`);
+    const proc = this.devicectl.launchWithConsole(deviceId, bundleId, (chunk) => log.app.append(chunk));
     this.appProcess = proc;
     void proc.promise
       .catch((err) => log.error("App console stream ended", err))

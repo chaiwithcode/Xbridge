@@ -37,17 +37,19 @@ package: ## Production bundle (no VSIX)
 
 vsix: package ## Build the distributable VSIX into builds/
 	@mkdir -p $(BUILD_DIR)
-	$(VSCE) package --allow-missing-repository -o $(VSIX)
+	$(VSCE) package -o $(VSIX)
 	@echo "Built $(VSIX)"
 
+CODE      := $(shell which code 2>/dev/null || echo "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code")
+
 install-ext: vsix ## Build the VSIX and install it into VS Code
-	code --install-extension $(VSIX) --force
+	"$(CODE)" --install-extension $(VSIX) --force
 
 uninstall-ext: ## Remove the extension from VS Code
-	code --uninstall-extension $(shell node -p "require('./package.json').publisher").$(NAME)
+	"$(CODE)" --uninstall-extension $(shell node -p "require('./package.json').publisher").$(NAME)
 
 publish: ## Publish to the VS Code Marketplace (requires VSCE_PAT)
-	$(VSCE) publish --allow-missing-repository
+	$(VSCE) publish
 
 clean: ## Remove build artifacts
 	rm -rf dist *.vsix $(BUILD_DIR)

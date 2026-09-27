@@ -1,0 +1,15 @@
+.vscode/**
+.vscode-test/**
+.github/**
+.eslintrc.json
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md
+src/**
+test/**
+.git/**
+.gitignore
+tsconfig.json
+esbuild.js
+Makefile
+**/*.tsbuildinfo
+node_modules/**

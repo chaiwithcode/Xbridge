@@ -3,6 +3,7 @@ import * as vscode from "vscode";
 import * as path from "path";
 import { XcodebuildService } from "../services/xcodebuild";
 import { SimctlService } from "../services/simctl";
+import { DevicectlService } from "../services/devicectl";
 import { ConfigService } from "../core/config";
 
 /** A "settings summary" row: a label with its current value, clickable to change. */
@@ -50,13 +51,15 @@ export class SchemeTreeProvider implements vscode.TreeDataProvider<Node> {
   constructor(
     private readonly xcodebuild: XcodebuildService,
     private readonly config: ConfigService,
-    private readonly simctl: SimctlService
+    private readonly simctl: SimctlService,
+    private readonly devicectl?: DevicectlService
   ) {}
 
   /** Re-reads project metadata from disk. */
   refresh(): void {
     this.xcodebuild.invalidate();
     this.simctl.invalidate();
+    this.devicectl?.invalidate();
     this._onDidChangeTreeData.fire();
   }
 
@@ -188,6 +191,13 @@ export class SchemeTreeProvider implements vscode.TreeDataProvider<Node> {
   private async projectLabel(): Promise<string> {
     try {
       const project = await this.config.resolveProject();
+      const wsFolders = vscode.workspace.workspaceFolders;
+      if (wsFolders && wsFolders.length > 0) {
+        const rel = path.relative(wsFolders[0].uri.fsPath, project.path);
+        if (rel && !rel.startsWith("..")) {
+          return rel;
+        }
+      }
       return path.basename(project.path);
     } catch {
       return "Select…";
@@ -198,6 +208,10 @@ export class SchemeTreeProvider implements vscode.TreeDataProvider<Node> {
     const udid = this.config.destination;
     if (!udid) {
       return "Any iOS Simulator";
+    }
+    const dev = await this.devicectl?.find(udid).catch(() => undefined);
+    if (dev) {
+      return dev.name;
     }
     const sim = await this.simctl.find(udid).catch(() => undefined);
     return sim ? sim.name : "Unknown device";

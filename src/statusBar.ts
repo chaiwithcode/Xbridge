@@ -2,6 +2,7 @@
 import * as vscode from "vscode";
 import { ConfigService } from "./core/config";
 import { SimctlService } from "./services/simctl";
+import { DevicectlService } from "./services/devicectl";
 
 /** The high-level action a status update belongs to. */
 export type ActionKind = "Build" | "Run" | "Test" | "Clean";
@@ -41,7 +42,8 @@ export class StatusBar implements vscode.Disposable {
 
   constructor(
     private readonly config: ConfigService,
-    private readonly simctl: SimctlService
+    private readonly simctl: SimctlService,
+    private readonly devicectl?: DevicectlService
   ) {
     this.runStop = this.create(106, "xbridge.run", "Run");
     this.build = this.create(105, "xbridge.build", "Build", "$(tools)", "XBridge: Build");
@@ -149,7 +151,7 @@ export class StatusBar implements vscode.Disposable {
       return;
     }
     let next = this.phase;
-    if (/Test Suite .* started|Testing started|\bTest case\b/.test(chunk)) {
+    if (/Test Suite .* started|Testing started|\bTest case\b|[◇] (?:Test|Suite) .+ started/.test(chunk)) {
       next = "Testing";
     } else if (/Launching|Installing app|Waiting for .* to launch/.test(chunk)) {
       next = "Launching";
@@ -229,15 +231,23 @@ export class StatusBar implements vscode.Disposable {
 
     let destination = "Any iOS Simulator";
     let booted = false;
+    let isPhysical = false;
     const destUdid = this.config.destination;
     if (destUdid) {
-      const sim = await this.simctl.find(destUdid).catch(() => undefined);
-      destination = sim ? sim.name : "Unknown device";
-      booted = sim?.state === "Booted";
+      const dev = await this.devicectl?.find(destUdid).catch(() => undefined);
+      if (dev) {
+        destination = dev.name;
+        isPhysical = true;
+      } else {
+        const sim = await this.simctl.find(destUdid).catch(() => undefined);
+        destination = sim ? sim.name : "Unknown device";
+        booted = sim?.state === "Booted";
+      }
     }
-    this.destination.text = `$(${booted ? "vm-running" : "device-mobile"}) ${destination}`;
+    const icon = isPhysical ? "plug" : booted ? "vm-running" : "device-mobile";
+    this.destination.text = `$(${icon}) ${destination}`;
     this.destination.tooltip = new vscode.MarkdownString(
-      `**Destination:** ${destination}${booted ? " (booted)" : ""}\n\n_Click to change the simulator or device._`
+      `**Destination:** ${destination}${booted ? " (booted)" : isPhysical ? " (device)" : ""}\n\n_Click to change the simulator or device._`
     );
   }
 

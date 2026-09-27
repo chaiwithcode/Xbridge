@@ -5,6 +5,7 @@ import { ConfigService } from "./core/config";
 import { log } from "./core/log";
 import { XcodebuildService } from "./services/xcodebuild";
 import { SimctlService } from "./services/simctl";
+import { DevicectlService } from "./services/devicectl";
 import { XBridgeManager } from "./manager";
 import { SchemeTreeProvider } from "./views/schemeTree";
 import { SimulatorTreeProvider } from "./views/simulatorTree";
@@ -18,13 +19,14 @@ export function activate(context: vscode.ExtensionContext): void {
 
   const config = new ConfigService();
   const simctl = new SimctlService();
+  const devicectl = new DevicectlService();
   const xcodebuild = new XcodebuildService(config);
-  const manager = new XBridgeManager(config, xcodebuild, simctl);
+  const manager = new XBridgeManager(config, xcodebuild, simctl, devicectl);
   context.subscriptions.push(manager);
 
-  const schemeTree = new SchemeTreeProvider(xcodebuild, config, simctl);
-  const simulatorTree = new SimulatorTreeProvider(simctl, () => config.destination);
-  const statusBar = new StatusBar(config, simctl);
+  const schemeTree = new SchemeTreeProvider(xcodebuild, config, simctl, devicectl);
+  const simulatorTree = new SimulatorTreeProvider(simctl, () => config.destination, devicectl);
+  const statusBar = new StatusBar(config, simctl, devicectl);
   context.subscriptions.push(statusBar);
 
   // Tree views (rather than bare providers) so they can carry a title
@@ -43,6 +45,7 @@ export function activate(context: vscode.ExtensionContext): void {
     manager,
     config,
     simctl,
+    devicectl,
     xcodebuild,
     schemeTree,
     simulatorTree,

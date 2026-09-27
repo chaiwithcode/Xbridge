@@ -1,6 +1,8 @@
 //  Created by Deepak Sharma on 03/07/2026.
 import * as vscode from "vscode";
 import * as path from "path";
+import * as fs from "fs";
+import { log } from "./log";
 
 export type ProjectKind = "workspace" | "project" | "package";
 
@@ -94,14 +96,37 @@ export class ConfigService {
     return undefined;
   }
 
+  get projectPath(): string | undefined {
+    return this.config.get<string>("projectPath") || undefined;
+  }
+
+  async setProjectPath(value: string | undefined): Promise<void> {
+    this.cachedProject = undefined;
+    await this.config.update("projectPath", value || undefined, vscode.ConfigurationTarget.Workspace);
+  }
+
+  private cachedProject?: XcodeProject;
+
+  /** Drops the cached detected project so the next call re-scans the workspace. */
+  invalidate(): void {
+    this.cachedProject = undefined;
+  }
+
   /**
    * Resolves the active Xcode project/workspace. Prefers an explicit
    * configured path, otherwise auto-detects within the workspace folders.
    */
   async resolveProject(): Promise<XcodeProject> {
-    const explicit = this.config.get<string>("projectPath");
+    const explicit = this.projectPath;
     if (explicit) {
-      return this.describe(explicit);
+      if (fs.existsSync(explicit)) {
+        return this.describe(explicit);
+      }
+      log.warn(`Configured project path "${explicit}" no longer exists on disk. Falling back to auto-detection.`);
+      await this.setProjectPath(undefined);
+    }
+    if (this.cachedProject && fs.existsSync(this.cachedProject.path)) {
+      return this.cachedProject;
     }
     const detected = await this.autoDetect();
     if (!detected) {
@@ -109,19 +134,22 @@ export class ConfigService {
         "No Xcode project, workspace or Package.swift found in the workspace. Set 'xbridge.projectPath' to specify one."
       );
     }
+    this.cachedProject = detected;
     return detected;
   }
 
   private tryResolveProjectSync(): XcodeProject | undefined {
-    const explicit = this.config.get<string>("projectPath");
+    const explicit = this.projectPath;
     if (explicit) {
       try {
-        return this.describe(explicit);
+        if (fs.existsSync(explicit)) {
+          return this.describe(explicit);
+        }
       } catch {
         return undefined;
       }
     }
-    return undefined;
+    return this.cachedProject && fs.existsSync(this.cachedProject.path) ? this.cachedProject : undefined;
   }
 
   private describe(targetPath: string): XcodeProject {
@@ -148,24 +176,57 @@ export class ConfigService {
   }
 
   private async autoDetect(): Promise<XcodeProject | undefined> {
-    // Prefer .xcworkspace, then .xcodeproj, then Package.swift.
-    const workspaces = await vscode.workspace.findFiles("**/*.xcworkspace/contents.xcworkspacedata", "**/node_modules/**", 5);
-    for (const ws of workspaces) {
-      const wsPath = path.dirname(ws.fsPath);
-      // Skip the project-embedded workspace inside .xcodeproj bundles.
-      if (!wsPath.includes(".xcodeproj/")) {
-        return this.describe(wsPath);
+    // Exclude common build directories, dependencies, and temporary outputs
+    const exclude = "**/{node_modules,.build,DerivedData,Pods,Carthage,SourcePackages,.swiftpm,build_product}/**";
+
+    // Helper: filters out project bundles that are nested inside another accepted project bundle or directory
+    const filterNested = (paths: string[]): string[] => {
+      const sorted = [...paths].sort((a, b) => a.split(path.sep).length - b.split(path.sep).length);
+      const roots: string[] = [];
+      for (const p of sorted) {
+        const pDir = path.dirname(p);
+        const isNested = roots.some((root) => {
+          const rel = path.relative(path.dirname(root), pDir);
+          return !rel.startsWith("..") && !path.isAbsolute(rel) && rel !== "";
+        });
+        if (!isNested) {
+          roots.push(p);
+        }
+      }
+      return roots;
+    };
+
+    // 1. Prefer .xcworkspace
+    const workspaces = await vscode.workspace.findFiles("**/*.xcworkspace/contents.xcworkspacedata", exclude, 30);
+    const validWorkspaces = filterNested(
+      workspaces
+        .map((ws) => path.dirname(ws.fsPath))
+        .filter((wsPath) => !wsPath.includes(".xcodeproj/"))
+    );
+    if (validWorkspaces.length > 0) {
+      return this.describe(validWorkspaces[0]);
+    }
+
+    // 2. Then .xcodeproj
+    const projects = await vscode.workspace.findFiles("**/*.xcodeproj/project.pbxproj", exclude, 30);
+    if (projects.length > 0) {
+      const validProjects = filterNested(
+        projects
+          .map((p) => path.dirname(p.fsPath))
+          .filter((p) => !p.includes(".xcodeproj/"))
+      );
+      if (validProjects.length > 0) {
+        return this.describe(validProjects[0]);
       }
     }
 
-    const projects = await vscode.workspace.findFiles("**/*.xcodeproj/project.pbxproj", "**/node_modules/**", 5);
-    if (projects.length > 0) {
-      return this.describe(path.dirname(projects[0].fsPath));
-    }
-
-    const packages = await vscode.workspace.findFiles("**/Package.swift", "**/node_modules/**", 5);
+    // 3. Then Package.swift
+    const packages = await vscode.workspace.findFiles("**/Package.swift", exclude, 20);
     if (packages.length > 0) {
-      return this.describe(packages[0].fsPath);
+      const sorted = packages
+        .map((p) => p.fsPath)
+        .sort((a, b) => a.split(path.sep).length - b.split(path.sep).length);
+      return this.describe(sorted[0]);
     }
 
     return undefined;

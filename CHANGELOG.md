@@ -1,5 +1,27 @@
 # Changelog
 
+## 1.4.0
+
+- **Physical iOS Device Support (`devicectl`)**:
+  - Connect real iPhones and iPads (iOS 17+) over USB or Wi-Fi; automatically detected via Apple's native CoreDevice framework (`xcrun devicectl`).
+  - Install, launch, and stream live application logs from physical devices.
+  - Automatic Developer Mode verification with actionable guidance if disabled.
+- **Swift Testing (`@Test`, `@Suite`) Parser Support**:
+  - Full output parsing for Swift 6 / Xcode 16 Swift Testing framework Unicode events (`◇`, `✔`, `✘`).
+  - Correct extraction of file locations, line numbers, and expectation failures for `@Test` suites alongside traditional `XCTest`.
+  - Improved Test Explorer test-identifier matching for Swift Testing function signatures.
+- **SPM Package Dependencies & Xcode Integration**:
+  - New **Resolve Package Dependencies** command and shortcut (<kbd>⌃⌘P</kbd>) running `xcodebuild -resolvePackageDependencies`.
+  - New **Open in Xcode** command to quickly open the project or workspace in Xcode.app.
+- **Expanded AI Agent Tools**:
+  - Added `#iosDiagnostics` (`xbridge_readDiagnostics`): reads compiler errors and test failures from the last build without rebuilding.
+  - Added `#iosClean` (`xbridge_clean`): cleans DerivedData build artifacts directly from AI prompts.
+  - Total of 8 AI language model tools for pair programming with Copilot/Cursor.
+- **Refreshed Destinations View & Status Bar**:
+  - The "Simulators" view is now "Destinations", listing Connected Devices at the top followed by Booted and Runtime simulator groups.
+  - Status bar destination pill displays a `$(plug)` icon and device name when a physical device is active.
+- Added `.vscodeignore` to eliminate unnecessary source and build files from the VSIX package.
+
 ## 1.3.0
 
 - Added complete extension identity and Marketplace metadata: author, homepage, gallery banner, pricing, Q&A, workspace runtime, trust capabilities, virtual-workspace limitations, and richer iOS/Swift discovery keywords.

@@ -160,6 +160,52 @@ class BootSimulatorTool implements Tool<BootInput> {
   }
 }
 
+/** Reads the diagnostics from the last build/test without re-running anything. */
+class ReadDiagnosticsTool implements Tool<Record<string, never>> {
+  constructor(private readonly manager: XBridgeManager) {}
+
+  async invoke(): Promise<vscode.LanguageModelToolResult> {
+    const result = this.manager.lastResult;
+    if (!result) {
+      return text(
+        "No build or test has been run yet in this session.",
+        "Use #iosBuild to build the project first."
+      );
+    }
+    const lines = [
+      result.succeeded ? "Last action succeeded." : "Last action failed.",
+      `Scheme: ${result.scheme}`,
+      "",
+      result.summary,
+    ];
+    if (result.parsed.errors.length === 0 && result.parsed.testFailures.length === 0) {
+      lines.push("", "No errors or test failures.");
+    }
+    return text(...lines);
+  }
+}
+
+/** Cleans the build folder so the next build starts fresh. */
+class CleanTool implements Tool<Record<string, never>> {
+  constructor(private readonly manager: XBridgeManager) {}
+
+  async prepareInvocation() {
+    return { invocationMessage: "Cleaning build folder…" };
+  }
+
+  async invoke(
+    _options: vscode.LanguageModelToolInvocationOptions<Record<string, never>>,
+    token: vscode.CancellationToken
+  ): Promise<vscode.LanguageModelToolResult> {
+    const result = await this.manager.clean(undefined, undefined, token);
+    return text(
+      result.succeeded ? "Clean succeeded." : "Clean failed.",
+      "",
+      result.summary
+    );
+  }
+}
+
 /** Registers all XBridge language-model tools for AI agents. */
 export function registerLanguageModelTools(
   context: vscode.ExtensionContext,
@@ -171,6 +217,8 @@ export function registerLanguageModelTools(
     vscode.lm.registerTool("xbridge_run", new RunTool(manager)),
     vscode.lm.registerTool("xbridge_listSchemes", new ListSchemesTool(manager)),
     vscode.lm.registerTool("xbridge_listSimulators", new ListSimulatorsTool(manager)),
-    vscode.lm.registerTool("xbridge_bootSimulator", new BootSimulatorTool(manager))
+    vscode.lm.registerTool("xbridge_bootSimulator", new BootSimulatorTool(manager)),
+    vscode.lm.registerTool("xbridge_readDiagnostics", new ReadDiagnosticsTool(manager)),
+    vscode.lm.registerTool("xbridge_clean", new CleanTool(manager))
   );
 }
