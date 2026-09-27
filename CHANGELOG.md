@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.1
+
+- Replaced the generic crossed-tools artwork with a distinctive connected-X brand mark.
+- Added a matching monochrome, theme-aware Activity Bar icon.
+- Consolidated packaged artwork and walkthrough content under `resources/`.
+- Fixed the README icon path so it renders consistently on GitHub and extension registries.
+- Refined the README positioning and license presentation.
+
 ## 1.4.0
 
 - **Physical iOS Device Support (`devicectl`)**:

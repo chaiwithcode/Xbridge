@@ -39,12 +39,21 @@ jobs:
           npx @vscode/vsce package -o builds/xbridge-${VERSION}.vsix
 
       - name: Create GitHub Release
-        run: gh release create "$GITHUB_REF_NAME" builds/*.vsix --generate-notes --title "$GITHUB_REF_NAME"
+        run: |
+          if ! gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
+            gh release create "$GITHUB_REF_NAME" builds/*.vsix --generate-notes --title "$GITHUB_REF_NAME"
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to VS Code Marketplace
         if: env.VSCE_PAT != ''
-        run: npx @vscode/vsce publish -p ${{ secrets.VSCE_PAT }}
+        run: npx @vscode/vsce publish --packagePath builds/*.vsix --skip-duplicate -p "$VSCE_PAT"
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
+
+      - name: Publish to Open VSX
+        if: env.OVSX_PAT != ''
+        run: npx ovsx publish builds/*.vsix --skip-duplicate
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}

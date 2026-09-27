@@ -2,7 +2,7 @@
   "name": "xbridge",
   "displayName": "XBridge",
   "description": "Build, test, and run Xcode projects from VS Code—with simulator, device, Test Explorer, and AI agent tools.",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "publisher": "chaiwithcode",
   "author": {
     "name": "Deepak Sharma"
