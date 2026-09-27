@@ -1,11 +1,11 @@
 <!--  Created by Deepak Sharma on 13/08/2026. -->
-## Simulators, at a glance
+## Destinations, at a glance
 
-The **Simulators** view groups every device by runtime, with booted ones pinned
-to the top. Click a device to make it the run destination — a green check marks
-the active one.
+The **Destinations** view lists connected iPhones and iPads first, followed by
+simulators grouped by runtime with booted ones pinned to the top. Click a device
+to make it the run destination — a green check marks the active one.
 
-Right-click any device for:
+Right-click a simulator for:
 
 - Boot / Shutdown
 - Open URL or deep link
