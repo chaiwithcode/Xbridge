@@ -169,4 +169,4 @@ We welcome community contributions! Please read our [Contributing Guide](CONTRIB
 
 ## License
 
-[MIT](LICENSE) © [Deepak Sharma](https://github.com/chaiwithcode)
+Released under the [MIT License](LICENSE). Copyright © 2026 Deepak Sharma.
