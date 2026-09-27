@@ -73,15 +73,45 @@ make vsix
 
 ---
 
+## Branching Strategy
+
+XBridge uses `develop` as its integration branch and keeps `main` production-ready.
+
+| Branch | Purpose | Created from | Merged into |
+| --- | --- | --- | --- |
+| `main` | Stable releases only | — | — |
+| `develop` | Integration for the next release | `main` | `main` through a release PR |
+| `feature/<name>` | New functionality | `develop` | `develop` |
+| `fix/<name>` | Non-urgent bug fixes | `develop` | `develop` |
+| `chore/<name>` | Documentation, tooling, and maintenance | `develop` | `develop` |
+| `release/<version>` | Final release stabilization | `develop` | `main`, then back into `develop` |
+| `hotfix/<version>` | Urgent production corrections | `main` | `main`, then back into `develop` |
+
+Both `main` and `develop` are protected. Changes must arrive through pull requests and pass the **Test & Build** CI check. Releases are tagged from `main` using semantic version tags such as `v1.4.1`.
+
+### Typical feature flow
+
+```bash
+git switch develop
+git pull --ff-only
+git switch -c feature/my-feature
+```
+
+Open the pull request against `develop`. When preparing a release, create `release/<version>` from `develop`, complete final verification, and open a pull request into `main`. After release, merge `main` back into `develop` so both branches contain the release commit and tag.
+
+---
+
 ## Submitting Pull Requests
 
-1. Create a descriptive branch:
+1. Start from `develop` and create a descriptive branch:
    ```bash
-   git checkout -b feat/my-awesome-feature
+   git switch develop
+   git pull --ff-only
+   git switch -c feature/my-awesome-feature
    ```
 2. Make your changes and commit with clear, conventional messages (`feat: ...`, `fix: ...`, `docs: ...`).
 3. Ensure all tests pass (`npm test`).
-4. Push your branch to GitHub and open a Pull Request.
+4. Push your branch to GitHub and open a pull request targeting `develop`.
 5. Provide a summary of changes, motivation, and screenshots/recordings if UI elements were modified.
 
 Thank you for helping make XBridge better!
