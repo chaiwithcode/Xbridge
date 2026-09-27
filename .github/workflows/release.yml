@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+
 jobs:
   release:
     name: Build & Publish Release
@@ -36,14 +39,9 @@ jobs:
           npx @vscode/vsce package -o builds/xbridge-${VERSION}.vsix
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: builds/*.vsix
-          generate_release_notes: true
-          draft: false
-          prerelease: false
+        run: gh release create "$GITHUB_REF_NAME" builds/*.vsix --generate-notes --title "$GITHUB_REF_NAME"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to VS Code Marketplace
         if: env.VSCE_PAT != ''
