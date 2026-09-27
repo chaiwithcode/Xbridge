@@ -21,7 +21,7 @@ This project and everyone participating in it is governed by the [XBridge Code o
 
 ### Getting the Code
 
-1. Fork the repo on GitHub: [https://github.com/chaiwithcode/xbridge](https://github.com/chaiwithcode/xbridge)
+1. Fork the repo on GitHub: [https://github.com/chaiwithcode/Xbridge](https://github.com/chaiwithcode/Xbridge)
 2. Clone your fork locally:
    ```bash
    git clone https://github.com/<your-username>/xbridge.git

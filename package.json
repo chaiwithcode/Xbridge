@@ -10,12 +10,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/chaiwithcode/xbridge.git"
+    "url": "https://github.com/chaiwithcode/Xbridge.git"
   },
   "bugs": {
-    "url": "https://github.com/chaiwithcode/xbridge/issues"
+    "url": "https://github.com/chaiwithcode/Xbridge/issues"
   },
-  "homepage": "https://github.com/chaiwithcode/xbridge#readme",
+  "homepage": "https://github.com/chaiwithcode/Xbridge#readme",
   "icon": "media/icon.png",
   "galleryBanner": {
     "color": "#0A84FF",

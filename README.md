@@ -1,11 +1,11 @@
 # XBridge — Build, Test, and Run Xcode Projects in VS Code
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/chaiwithcode/xbridge/main/media/icon.png" width="128" height="128" alt="XBridge Logo" />
+  <img src="https://raw.githubusercontent.com/chaiwithcode/Xbridge/main/media/icon.png" width="128" height="128" alt="XBridge Logo" />
 </p>
 
 <p align="center">
-  <a href="https://github.com/chaiwithcode/xbridge/actions"><img src="https://github.com/chaiwithcode/xbridge/actions/workflows/ci.yml/badge.svg" alt="CI Status" /></a>
+  <a href="https://github.com/chaiwithcode/Xbridge/actions"><img src="https://github.com/chaiwithcode/Xbridge/actions/workflows/ci.yml/badge.svg" alt="CI Status" /></a>
   <a href="https://marketplace.visualstudio.com/items?itemName=chaiwithcode.xbridge"><img src="https://img.shields.io/visual-studio-marketplace/v/chaiwithcode.xbridge?color=0A84FF&label=Marketplace" alt="Marketplace Version" /></a>
   <a href="https://marketplace.visualstudio.com/items?itemName=chaiwithcode.xbridge"><img src="https://img.shields.io/visual-studio-marketplace/i/chaiwithcode.xbridge?color=34C759&label=Installs" alt="Installs" /></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License" /></a>
@@ -159,7 +159,7 @@ Configure XBridge in your User or Workspace `settings.json`:
 
 We welcome community contributions! Please read our [Contributing Guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) before submitting pull requests.
 
-1. Fork the repository: [https://github.com/chaiwithcode/xbridge](https://github.com/chaiwithcode/xbridge)
+1. Fork the repository: [https://github.com/chaiwithcode/Xbridge](https://github.com/chaiwithcode/Xbridge)
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
