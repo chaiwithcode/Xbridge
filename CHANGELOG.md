@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.2
+
+- Replaced retired Visual Studio Marketplace metadata badges with supported release and install badges.
+- Added a direct Marketplace installation link and extension identifier to the README.
+- Excluded local build outputs from published VSIX packages.
+
 ## 1.4.1
 
 - Replaced the generic crossed-tools artwork with a distinctive connected-X brand mark.
