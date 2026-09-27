@@ -6,8 +6,8 @@
 
 <p align="center">
   <a href="https://github.com/chaiwithcode/Xbridge/actions"><img src="https://github.com/chaiwithcode/Xbridge/actions/workflows/ci.yml/badge.svg" alt="CI Status" /></a>
-  <a href="https://marketplace.visualstudio.com/items?itemName=chaiwithcode.xbridge"><img src="https://img.shields.io/visual-studio-marketplace/v/chaiwithcode.xbridge?color=0A84FF&label=Marketplace" alt="Marketplace Version" /></a>
-  <a href="https://marketplace.visualstudio.com/items?itemName=chaiwithcode.xbridge"><img src="https://img.shields.io/visual-studio-marketplace/i/chaiwithcode.xbridge?color=34C759&label=Installs" alt="Installs" /></a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=chaiwithcode.xbridge"><img src="https://img.shields.io/github/v/release/chaiwithcode/Xbridge?display_name=tag&label=Marketplace&color=0A84FF" alt="Marketplace Version" /></a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=chaiwithcode.xbridge"><img src="https://img.shields.io/badge/Install-VS%20Code-34C759?logo=visualstudiocode&logoColor=white" alt="Install XBridge from the Visual Studio Marketplace" /></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License" /></a>
 </p>
 
@@ -17,6 +17,7 @@
 </p>
 
 <p align="center">
+  <a href="#installation">Installation</a> •
   <a href="#features">Features</a> •
   <a href="#ai-agent-tools">AI Tools</a> •
   <a href="#physical-device-support">Physical Devices</a> •
@@ -24,6 +25,12 @@
   <a href="#contributing">Contributing</a> •
   <a href="#settings">Settings</a>
 </p>
+
+---
+
+## Installation
+
+Install [XBridge from the Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=chaiwithcode.xbridge), or open the Extensions view in VS Code and search for `chaiwithcode.xbridge`.
 
 ---
 
