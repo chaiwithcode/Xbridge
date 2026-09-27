@@ -16,7 +16,7 @@
     "url": "https://github.com/chaiwithcode/Xbridge/issues"
   },
   "homepage": "https://github.com/chaiwithcode/Xbridge#readme",
-  "icon": "media/icon.png",
+  "icon": "resources/icon.png",
   "galleryBanner": {
     "color": "#0A84FF",
     "theme": "dark"
@@ -383,7 +383,7 @@
         {
           "id": "xbridge",
           "title": "XBridge",
-          "icon": "media/activity.svg"
+          "icon": "resources/activity.svg"
         }
       ]
     },
@@ -793,7 +793,7 @@
             "title": "Pick your project",
             "description": "XBridge auto-detects an .xcodeproj, .xcworkspace or Package.swift in your folder. If you have several, choose one.\n[Select Xcode Project](command:xbridge.selectProject)",
             "media": {
-              "markdown": "media/walkthrough/project.md"
+              "markdown": "resources/walkthrough/project.md"
             },
             "completionEvents": [
               "onCommand:xbridge.selectProject"
@@ -804,7 +804,7 @@
             "title": "Choose a simulator",
             "description": "Open the XBridge view in the Activity Bar and click any simulator to make it your run destination — booted devices are listed first.\n[Select Destination](command:xbridge.selectDestination)",
             "media": {
-              "markdown": "media/walkthrough/destination.md"
+              "markdown": "resources/walkthrough/destination.md"
             },
             "completionEvents": [
               "onCommand:xbridge.selectDestination",
@@ -816,7 +816,7 @@
             "title": "Build and run",
             "description": "Hit Run to build, install and launch on the simulator. The app's console streams into the XBridge App output channel.\n[Build & Run](command:xbridge.run)",
             "media": {
-              "markdown": "media/walkthrough/run.md"
+              "markdown": "resources/walkthrough/run.md"
             },
             "completionEvents": [
               "onCommand:xbridge.run"
@@ -827,7 +827,7 @@
             "title": "Let Copilot drive Xcode",
             "description": "Reference #iosBuild, #iosTest or #iosRun in Copilot Chat and the agent can compile your Swift code, run tests and read back the failures.\n[Open Chat](command:workbench.action.chat.open)",
             "media": {
-              "markdown": "media/walkthrough/ai.md"
+              "markdown": "resources/walkthrough/ai.md"
             }
           }
         ]

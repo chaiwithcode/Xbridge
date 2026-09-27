@@ -1,7 +1,7 @@
 # XBridge — Build, Test, and Run Xcode Projects in VS Code
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/chaiwithcode/Xbridge/main/media/icon.png" width="128" height="128" alt="XBridge Logo" />
+  <img src="resources/icon.png" width="128" height="128" alt="XBridge logo" />
 </p>
 
 <p align="center">

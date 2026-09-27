@@ -1,0 +1,6 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+  <!-- Monochrome connected-X mark for VS Code's theme-aware Activity Bar. -->
+  <path d="M2 2h5l5 6.5L9 12l3 3.5L7 22H2l7-10L2 2Z"/>
+  <path d="M22 2h-5l-5 6.5 3 3.5-3 3.5 5 6.5h5l-7-10 7-10Z"/>
+  <path d="M9 10.5h6l1.5 1.5-1.5 1.5H9L7.5 12 9 10.5Z"/>
+</svg>
