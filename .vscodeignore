@@ -13,3 +13,4 @@ esbuild.js
 Makefile
 **/*.tsbuildinfo
 node_modules/**
+builds/**
