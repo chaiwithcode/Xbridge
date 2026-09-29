@@ -1,0 +1,72 @@
+name: Publish Open VSX
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing XBridge GitHub release tag (for example, v1.4.2)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Publish release VSIX to Open VSX
+    runs-on: ubuntu-latest
+    env:
+      RELEASE_TAG: ${{ inputs.tag }}
+
+    steps:
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Check configuration and release tag
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          if [ -z "$OVSX_PAT" ]; then
+            echo "::error::Add an Open VSX access token as the OVSX_PAT repository secret."
+            exit 1
+          fi
+          if [[ ! "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Use an existing XBridge release tag such as v1.4.2."
+            exit 1
+          fi
+
+      - name: Download and verify the GitHub release VSIX
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${RELEASE_TAG#v}"
+          PACKAGE="builds/xbridge-${VERSION}.vsix"
+          mkdir -p builds
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern "xbridge-${VERSION}.vsix" --dir builds
+          test -s "$PACKAGE"
+          IDENTITY=$(unzip -p "$PACKAGE" extension/package.json | node -e 'let data = ""; process.stdin.on("data", chunk => data += chunk).on("end", () => { const manifest = JSON.parse(data); console.log(`${manifest.publisher}.${manifest.name}@${manifest.version}`); })')
+          if [ "$IDENTITY" != "chaiwithcode.xbridge@$VERSION" ]; then
+            echo "::error::The release VSIX identity does not match chaiwithcode.xbridge@$VERSION."
+            exit 1
+          fi
+
+      - name: Create the namespace if needed
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          HTTP_STATUS=$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' https://open-vsx.org/api/chaiwithcode)
+          case "$HTTP_STATUS" in
+            200) echo "The chaiwithcode namespace already exists." ;;
+            404) npx --yes ovsx@1.1.1 create-namespace chaiwithcode ;;
+            *) echo "::error::Open VSX namespace lookup returned HTTP $HTTP_STATUS."; exit 1 ;;
+          esac
+
+      - name: Publish to Open VSX
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          VERSION="${RELEASE_TAG#v}"
+          npx --yes ovsx@1.1.1 publish "builds/xbridge-${VERSION}.vsix" --skip-duplicate
+          echo "[Check the Open VSX listing](https://open-vsx.org/extension/chaiwithcode/xbridge)" >> "$GITHUB_STEP_SUMMARY"

@@ -99,6 +99,8 @@ git switch -c feature/my-feature
 
 Open the pull request against `develop`. When preparing a release, create `release/<version>` from `develop`, complete final verification, and open a pull request into `main`. After release, merge `main` back into `develop` so both branches contain the release commit and tag.
 
+Maintainers preparing the second registry listing can follow the [Open VSX publishing guide](docs/open-vsx.md).
+
 ---
 
 ## Submitting Pull Requests
