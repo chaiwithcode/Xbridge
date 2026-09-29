@@ -54,6 +54,6 @@ jobs:
 
       - name: Publish to Open VSX
         if: env.OVSX_PAT != ''
-        run: npx ovsx publish builds/*.vsix --skip-duplicate
+        run: npx --yes ovsx@1.1.1 publish builds/*.vsix --skip-duplicate
         env:
           OVSX_PAT: ${{ secrets.OVSX_PAT }}
