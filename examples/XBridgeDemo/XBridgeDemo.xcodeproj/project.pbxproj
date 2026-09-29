@@ -1,0 +1,459 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3339FC342000793B43D0BD6E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D21DF1F5E075569C85A5A80D /* Foundation.framework */; };
+		42D7BFFFA5CBABA2F46D7E50 /* ModernTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ABB7018A6B79EA9E51BB8FB /* ModernTests.swift */; };
+		7A85D9FDE9A8B9352A26476B /* XBridgeDemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A1711653BCBC7EB5A424C4 /* XBridgeDemoApp.swift */; };
+		7A99EADFB04BDDA6FD8EA929 /* XBridgeDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89D0980295DEE023A32B5DC9 /* XBridgeDemoTests.swift */; };
+		9F3DFB026CACCEA2DD8BF023 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C94386DDF7FC57A34733389 /* ContentView.swift */; };
+		A056ED2D15E03B6267D834B4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D21DF1F5E075569C85A5A80D /* Foundation.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		5744DE6251B303F1CB3C9DF3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 926908D120004E2CDF95387F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 38C28A02E02E1A716344BAFD;
+			remoteInfo = XBridgeDemo;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		15A1711653BCBC7EB5A424C4 /* XBridgeDemoApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = XBridgeDemoApp.swift; sourceTree = "<group>"; };
+		1ABB7018A6B79EA9E51BB8FB /* ModernTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ModernTests.swift; sourceTree = "<group>"; };
+		2C5D9B1CEA7CDD627FE83B70 /* XBridgeDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = XBridgeDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6238FA757782EB5EADFF0828 /* XBridgeDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XBridgeDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		89D0980295DEE023A32B5DC9 /* XBridgeDemoTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = XBridgeDemoTests.swift; sourceTree = "<group>"; };
+		8C94386DDF7FC57A34733389 /* ContentView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		D21DF1F5E075569C85A5A80D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		5623CC290D6BB5B3555C9E37 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A056ED2D15E03B6267D834B4 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		797F4E7CC0A84E8ADD920E9C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3339FC342000793B43D0BD6E /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4F75EA34634134EB2327C973 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6238FA757782EB5EADFF0828 /* XBridgeDemo.app */,
+				2C5D9B1CEA7CDD627FE83B70 /* XBridgeDemoTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		5AABD117A77BFAA3F72F4001 = {
+			isa = PBXGroup;
+			children = (
+				4F75EA34634134EB2327C973 /* Products */,
+				76777653C83C84E6DFCCB739 /* Frameworks */,
+				A4B20FD811B3FAA4740D5F89 /* XBridgeDemo */,
+				79D6CE832ACE6D6DC6AC9F05 /* XBridgeDemoTests */,
+			);
+			sourceTree = "<group>";
+		};
+		76777653C83C84E6DFCCB739 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C4778F146AEF9B99291A3F90 /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		79D6CE832ACE6D6DC6AC9F05 /* XBridgeDemoTests */ = {
+			isa = PBXGroup;
+			children = (
+				89D0980295DEE023A32B5DC9 /* XBridgeDemoTests.swift */,
+				1ABB7018A6B79EA9E51BB8FB /* ModernTests.swift */,
+			);
+			name = XBridgeDemoTests;
+			path = XBridgeDemoTests;
+			sourceTree = "<group>";
+		};
+		A4B20FD811B3FAA4740D5F89 /* XBridgeDemo */ = {
+			isa = PBXGroup;
+			children = (
+				15A1711653BCBC7EB5A424C4 /* XBridgeDemoApp.swift */,
+				8C94386DDF7FC57A34733389 /* ContentView.swift */,
+			);
+			name = XBridgeDemo;
+			path = XBridgeDemo;
+			sourceTree = "<group>";
+		};
+		C4778F146AEF9B99291A3F90 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				D21DF1F5E075569C85A5A80D /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		38C28A02E02E1A716344BAFD /* XBridgeDemo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9B8353B98D321DDF7007E5DD /* Build configuration list for PBXNativeTarget "XBridgeDemo" */;
+			buildPhases = (
+				3ED4D77EFBB1BAF4890B3D9F /* Sources */,
+				797F4E7CC0A84E8ADD920E9C /* Frameworks */,
+				5A26789469FEB06DBB37C2A2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = XBridgeDemo;
+			productName = XBridgeDemo;
+			productReference = 6238FA757782EB5EADFF0828 /* XBridgeDemo.app */;
+			productType = "com.apple.product-type.application";
+		};
+		E343816C6E356CED400EAB1F /* XBridgeDemoTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 974B1B4BE0A6E8DBF5A93B89 /* Build configuration list for PBXNativeTarget "XBridgeDemoTests" */;
+			buildPhases = (
+				95855EDEB98C88C5E50A19C9 /* Sources */,
+				5623CC290D6BB5B3555C9E37 /* Frameworks */,
+				56C8A09B750384342F4A89E2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A3AC2A892FD3D0A005C28BE6 /* PBXTargetDependency */,
+			);
+			name = XBridgeDemoTests;
+			productName = XBridgeDemoTests;
+			productReference = 2C5D9B1CEA7CDD627FE83B70 /* XBridgeDemoTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		926908D120004E2CDF95387F /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 2660;
+				LastUpgradeCheck = 2660;
+			};
+			buildConfigurationList = 4FE1DAE27A9BF849A7EFCED6 /* Build configuration list for PBXProject "XBridgeDemo" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 5AABD117A77BFAA3F72F4001;
+			minimizedProjectReferenceProxies = 0;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 4F75EA34634134EB2327C973 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				38C28A02E02E1A716344BAFD /* XBridgeDemo */,
+				E343816C6E356CED400EAB1F /* XBridgeDemoTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		56C8A09B750384342F4A89E2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5A26789469FEB06DBB37C2A2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3ED4D77EFBB1BAF4890B3D9F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7A85D9FDE9A8B9352A26476B /* XBridgeDemoApp.swift in Sources */,
+				9F3DFB026CACCEA2DD8BF023 /* ContentView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		95855EDEB98C88C5E50A19C9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7A99EADFB04BDDA6FD8EA929 /* XBridgeDemoTests.swift in Sources */,
+				42D7BFFFA5CBABA2F46D7E50 /* ModernTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A3AC2A892FD3D0A005C28BE6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = XBridgeDemo;
+			target = 38C28A02E02E1A716344BAFD /* XBridgeDemo */;
+			targetProxy = 5744DE6251B303F1CB3C9DF3 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		03F3B0CAB58D500D2D3DCF86 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chaiwithcode.XBridgeDemoTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/XBridgeDemo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/XBridgeDemo";
+			};
+			name = Debug;
+		};
+		44B5F68238D33181F33D81DC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		5915172CE0D64BA5F77731AE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.chaiwithcode.XBridgeDemo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		7E6DCA70F2C65BCFF5E627F8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chaiwithcode.XBridgeDemoTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/XBridgeDemo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/XBridgeDemo";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		B3BC7A1BB930F45E88B8E6F9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		C0216E6A1D67B593D084CC55 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.chaiwithcode.XBridgeDemo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4FE1DAE27A9BF849A7EFCED6 /* Build configuration list for PBXProject "XBridgeDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B3BC7A1BB930F45E88B8E6F9 /* Debug */,
+				44B5F68238D33181F33D81DC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		974B1B4BE0A6E8DBF5A93B89 /* Build configuration list for PBXNativeTarget "XBridgeDemoTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7E6DCA70F2C65BCFF5E627F8 /* Release */,
+				03F3B0CAB58D500D2D3DCF86 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9B8353B98D321DDF7007E5DD /* Build configuration list for PBXNativeTarget "XBridgeDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0216E6A1D67B593D084CC55 /* Release */,
+				5915172CE0D64BA5F77731AE /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 926908D120004E2CDF95387F /* Project object */;
+}
