@@ -18,6 +18,7 @@
 
 <p align="center">
   <a href="#installation">Installation</a> •
+  <a href="#see-xbridge-in-action">Demo</a> •
   <a href="#features">Features</a> •
   <a href="#ai-agent-tools">AI Tools</a> •
   <a href="#physical-device-support">Physical Devices</a> •
@@ -31,6 +32,16 @@
 ## Installation
 
 Install [XBridge from the Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=chaiwithcode.xbridge), or open the Extensions view in VS Code and search for `chaiwithcode.xbridge`.
+
+---
+
+## See XBridge in action
+
+![XBridge feature tour showing project controls, passing tests, and an app running in Simulator](docs/images/feature-tour.gif)
+
+The tour uses the included [XBridgeDemo Xcode project](examples/XBridgeDemo). View the full-resolution captures: [project and destination controls](docs/images/overview.png), [XCTest and Swift Testing in Test Explorer](docs/images/tests.png), [build and run](docs/images/build-and-run.png), and [the iPhone app](docs/images/demo-app.png).
+
+[Explore every XBridge command and AI tool](docs/capabilities.md).
 
 ---
 
